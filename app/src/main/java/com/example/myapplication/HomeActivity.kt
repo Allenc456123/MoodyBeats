@@ -1,6 +1,8 @@
 package com.example.myapplication
 
 import android.os.Bundle
+import android.util.Log
+import android.view.MenuItem
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -8,33 +10,46 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.myapplication.databinding.ActivityHomeBinding
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationBarView
 
 class HomeActivity : AppCompatActivity() {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var binding: ActivityHomeBinding
+    private lateinit var bottomNavigationView: BottomNavigationView
+    private val playFragment = PlayFragment()
+    private val recommendFragment = RecommendFragment()
+    private val libraryFragment = LibraryFragment()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_home)
+        Log.i("MYTAG", "HomeActivity : OnCreate")
+        bottomNavigationView=findViewById(R.id.bottom_navigationBar)
 
-        binding = ActivityHomeBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
-        setSupportActionBar(binding.toolbar)
+        supportFragmentManager.beginTransaction().replace(R.id.container, playFragment).commit()
 
-        val navController = findNavController(R.id.nav_host_fragment_content_home)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)
+        bottomNavigationView.setOnItemSelectedListener(object : NavigationBarView.OnItemSelectedListener {
+            override fun onNavigationItemSelected(item: MenuItem): Boolean {
+                when (item.itemId) {
+                    R.id.play -> {
+                        supportFragmentManager.beginTransaction().replace(R.id.container, playFragment).commit()
+                        return true
+                    }
+                    R.id.recommend -> {
+                        supportFragmentManager.beginTransaction().replace(R.id.container, recommendFragment).commit()
+                        return true
+                    }
+                    R.id.library -> {
+                        supportFragmentManager.beginTransaction().replace(R.id.container, libraryFragment).commit()
+                        return true
+                    }
+                }
 
-        binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
+                return false
+            }
+        })
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_home)
-        return navController.navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
-    }
 }
