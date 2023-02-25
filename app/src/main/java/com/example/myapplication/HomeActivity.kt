@@ -24,7 +24,6 @@ class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-        Log.i("MYTAG", "HomeActivity : OnCreate")
         bottomNavigationView=findViewById(R.id.bottom_navigationBar)
 
 
@@ -52,4 +51,28 @@ class HomeActivity : AppCompatActivity() {
         })
     }
 
+    override fun onStart() {
+        super.onStart()
+        Log.i("myTag","OnStart for Home Activity has been called")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.i("myTag","OnResume for Home Activity has been called")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.i("myTag","OnPause for Home Activity has been called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.i("myTag","OnStop for Home Activity has been called")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.i("myTag","OnDestroy for Home Activity has been called")
+    }
 }
