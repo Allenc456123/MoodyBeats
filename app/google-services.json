@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "816752346551",
+    "project_id": "moodybeats-93ad9",
+    "storage_bucket": "moodybeats-93ad9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:816752346551:android:d5260bdd025e923daf9432",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "816752346551-3t53mf53ebf33gdd3ftdc0l66iaq24ol.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYrJOFFjgR1laV4rVVQLNzSD1KJoZYZ30"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "816752346551-3t53mf53ebf33gdd3ftdc0l66iaq24ol.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
