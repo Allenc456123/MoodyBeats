@@ -6,32 +6,24 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.spotify.android.appremote.api.ConnectionParams
-import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 
 private const val CLIENT_ID = "8a9c4c8a356e484eb01e57b844806133"
-private const val REDIRECT_URI = "http://example.com/callback/"
+private const val REDIRECT_URI = "com.example.myapplication://callback"
 private var mSpotifyAppRemote: SpotifyAppRemote? = null
 private const val REQUEST_CODE = 1337
 
 
 class LoginActivity : AppCompatActivity() {
-    val request =
-        AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI)
-            .setScopes(
-                arrayOf(
-                    "user-read-private",
-                    "playlist-read",
-                    "playlist-read-private",
-                    "streaming"
-                )
-            ).build()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val builder = AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI)
+        builder.setScopes(arrayOf("streaming, user-read-email"))
+        val request = builder.build()
         setContentView(R.layout.activity_login)
 
         Log.i("myTag","OnCreate for Login Activity has been called")
@@ -39,8 +31,6 @@ class LoginActivity : AppCompatActivity() {
         val loginButton = findViewById<Button>(R.id.loginButton)
         loginButton.setOnClickListener {
             AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request)
-            /*val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)*/
         }
 
         val button = findViewById<Button>(R.id.signUpButton)
@@ -55,6 +45,32 @@ class LoginActivity : AppCompatActivity() {
 
             // Start the Intent
             startActivity(intent)
+        }
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CODE) {
+            val response = AuthorizationClient.getResponse(resultCode, data)
+
+            when (response.type) {
+                AuthorizationResponse.Type.TOKEN -> {
+                    val token = response.accessToken
+                    Log.d("AUTHENTICATION", "Got Spotify access token: $token")
+                    // Save token to SharedPreferences or use it to make API requests
+                    val intent = Intent(this, HomeActivity::class.java)
+                    intent.putExtra("TOKEN_KEY", token)
+                    startActivity(intent)
+                }
+                AuthorizationResponse.Type.ERROR -> {
+                    Log.e("AUTHENTICATION", "Failed to authenticate with Spotify: ${response.error}")
+                    // Handle authentication error
+                }
+                else -> {
+                    Log.e("AUTHENTICATION", "Unknown authentication response type: ${response.type}")
+                    // Handle unknown response type
+                }
+            }
         }
     }
 
