@@ -9,14 +9,27 @@ import androidx.appcompat.app.AppCompatActivity
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
-
+import com.spotify.sdk.android.auth.AuthorizationClient
+import com.spotify.sdk.android.auth.AuthorizationRequest
+import com.spotify.sdk.android.auth.AuthorizationResponse
 
 private const val CLIENT_ID = "8a9c4c8a356e484eb01e57b844806133"
 private const val REDIRECT_URI = "http://example.com/callback/"
 private var mSpotifyAppRemote: SpotifyAppRemote? = null
+private const val REQUEST_CODE = 1337
+
 
 class LoginActivity : AppCompatActivity() {
-
+    val request =
+        AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI)
+            .setScopes(
+                arrayOf(
+                    "user-read-private",
+                    "playlist-read",
+                    "playlist-read-private",
+                    "streaming"
+                )
+            ).build()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -25,8 +38,9 @@ class LoginActivity : AppCompatActivity() {
 
         val loginButton = findViewById<Button>(R.id.loginButton)
         loginButton.setOnClickListener {
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
+            AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request)
+            /*val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)*/
         }
 
         val button = findViewById<Button>(R.id.signUpButton)
@@ -46,7 +60,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        val connectionParams = ConnectionParams.Builder(CLIENT_ID)
+        /*val connectionParams = ConnectionParams.Builder(CLIENT_ID)
             .setRedirectUri(REDIRECT_URI)
             .showAuthView(true)
             .build()
@@ -55,7 +69,7 @@ class LoginActivity : AppCompatActivity() {
                 override fun onConnected(spotifyAppRemote: SpotifyAppRemote) {
                     mSpotifyAppRemote = spotifyAppRemote
                     Log.d("MainActivity", "Connected! Yay!")
-
+                    Log.i("tag", "spot onconnect")
                     // Now you can start interacting with App Remote
                     //connected()
                 }
@@ -66,7 +80,7 @@ class LoginActivity : AppCompatActivity() {
                     // Something went wrong when attempting to connect! Handle errors here
                 }
             })
-
+*/
         Log.i("myTag","OnStart for Login Activity has been called")
     }
 
