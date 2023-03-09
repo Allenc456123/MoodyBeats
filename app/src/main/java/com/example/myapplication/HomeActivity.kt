@@ -18,6 +18,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.myapplication.databinding.ActivityHomeBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
+import com.google.firebase.database.*
 
 class HomeActivity : AppCompatActivity() {
 
@@ -29,6 +30,28 @@ class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+        val database = FirebaseDatabase.getInstance().reference
+        val email = intent.getStringExtra("EMAIL") ?: ""
+        Log.i("pref","email got???${email}")
+        val query: Query = database.child("emails").orderByChild("email").equalTo(email)
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    val emailNode = dataSnapshot.children.first()
+                    val preferencesNode = emailNode.child("preferences")
+                    val brightPref = preferencesNode.child("BRIGHT").value.toString()
+                    val mediumPref = preferencesNode.child("MEDIUM").value.toString()
+                    val darkPref = preferencesNode.child("DARK").value.toString()
+                    // Do something with the preferences values
+                    Log.i("pref",brightPref+mediumPref+darkPref)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle error
+            }
+        })
+
 
 
         //getEmail(token)

@@ -27,6 +27,7 @@ class RecommendationActivity : AppCompatActivity() {
         val queue = Volley.newRequestQueue(this)
         val url = "https://api.spotify.com/v1/me"
         var email=""
+        val intent = Intent(this, HomeActivity::class.java)
 
 
 
@@ -88,6 +89,8 @@ class RecommendationActivity : AppCompatActivity() {
                     val query: Query = database.child("emails").orderByChild("email").equalTo(email)
                     query.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(dataSnapshot: DataSnapshot) {
+                            intent.putExtra("EMAIL", email)
+                            startActivity(intent)
                             if (dataSnapshot.exists()) {
                                 // Email already exists in the database
                                 Log.i("FIREBASE", "Email already exists")
@@ -138,8 +141,6 @@ class RecommendationActivity : AppCompatActivity() {
             }
             queue.add(request)
 
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
         }
     }
 
