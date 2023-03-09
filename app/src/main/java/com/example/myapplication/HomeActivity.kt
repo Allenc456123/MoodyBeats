@@ -26,35 +26,9 @@ class HomeActivity : AppCompatActivity() {
     private val recommendFragment = RecommendFragment()
     private val libraryFragment = LibraryFragment()
 
-    private fun getEmail(token:String?){
-        val queue = Volley.newRequestQueue(this)
-        val url = "https://api.spotify.com/v1/me"
-        var email=""
-
-        val request = object : JsonObjectRequest(Method.GET, url, null,
-            Response.Listener { response ->
-                email = response.getString("email")
-                Log.d("SPOTIFY", "User email: $email")
-            },
-            Response.ErrorListener { error ->
-                Log.e("SPOTIFY", "Error getting user email: ${error.message}")
-            }) {
-            @Throws(AuthFailureError::class)
-            override fun getHeaders(): Map<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer $token"
-                return headers
-            }
-        }
-        queue.add(request)
-    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-        val token = intent.getStringExtra("TOKEN_KEY")
-        val intent = Intent(this, RecommendationActivity::class.java)
-        intent.putExtra("TOKEN_KEY", token)
-        startActivity(intent)
 
 
         //getEmail(token)

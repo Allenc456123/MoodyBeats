@@ -9,9 +9,9 @@
     android:background="#000000"
     tools:context=".RecommendationActivity">
     <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -27,70 +27,70 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 1" />
+                android:text="@string/genre1" />
 
             <CheckBox
                 android:id="@+id/checkbox1_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 2" />
+                android:text="@string/genre2" />
 
             <CheckBox
                 android:id="@+id/checkbox1_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 3" />
+                android:text="@string/genre3" />
 
             <CheckBox
                 android:id="@+id/checkbox1_4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 4" />
+                android:text="@string/genre4" />
 
             <CheckBox
                 android:id="@+id/checkbox1_5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 5" />
+                android:text="@string/genre5" />
 
             <CheckBox
                 android:id="@+id/checkbox1_6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 6" />
+                android:text="@string/genre6" />
 
             <CheckBox
                 android:id="@+id/checkbox1_7"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 7" />
+                android:text="@string/genre7" />
 
             <CheckBox
                 android:id="@+id/checkbox1_8"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 8" />
+                android:text="@string/genre8" />
 
             <CheckBox
                 android:id="@+id/checkbox1_9"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 9" />
+                android:text="@string/genre9" />
 
             <CheckBox
                 android:id="@+id/checkbox1_10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 10" />
+                android:text="@string/genre10" />
         </LinearLayout>
 
         <LinearLayout
@@ -108,21 +108,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 1" />
+                android:text="@string/genre1" />
 
             <CheckBox
                 android:id="@+id/checkbox2_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 2" />
+                android:text="@string/genre2" />
 
             <CheckBox
                 android:id="@+id/checkbox2_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 3" />
+                android:text="@string/genre3" />
 
 
             <CheckBox
@@ -130,49 +130,49 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 4" />
+                android:text="@string/genre4" />
 
             <CheckBox
                 android:id="@+id/checkbox2_5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 5" />
+                android:text="@string/genre5" />
 
             <CheckBox
                 android:id="@+id/checkbox2_6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 6" />
+                android:text="@string/genre6" />
 
             <CheckBox
                 android:id="@+id/checkbox2_7"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 7" />
+                android:text="@string/genre7" />
 
             <CheckBox
                 android:id="@+id/checkbox2_8"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 8" />
+                android:text="@string/genre8" />
 
             <CheckBox
                 android:id="@+id/checkbox2_9"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 9" />
+                android:text="@string/genre9" />
 
             <CheckBox
                 android:id="@+id/checkbox2_10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 10" />
+                android:text="@string/genre10" />
         </LinearLayout>
 
 
@@ -192,69 +192,69 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 1" />
+                android:text="@string/genre1" />
 
             <CheckBox
                 android:id="@+id/checkbox3_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 2" />
+                android:text="@string/genre2" />
 
             <CheckBox
                 android:id="@+id/checkbox3_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 3" />
+                android:text="@string/genre3" />
 
             <CheckBox
                 android:id="@+id/checkbox3_4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 4" />
+                android:text="@string/genre4" />
 
             <CheckBox
                 android:id="@+id/checkbox3_5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 5" />
+                android:text="@string/genre5" />
 
             <CheckBox
                 android:id="@+id/checkbox3_6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 6" />
+                android:text="@string/genre6" />
 
             <CheckBox
                 android:id="@+id/checkbox3_7"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 7" />
+                android:text="@string/genre7"/>
 
             <CheckBox
                 android:id="@+id/checkbox3_8"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 8" />
+                android:text="@string/genre8" />
 
             <CheckBox
                 android:id="@+id/checkbox3_9"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 9" />
+                android:text="@string/genre9" />
             <CheckBox
                 android:id="@+id/checkbox3_10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Checkbox 10" />
+                android:text="@string/genre10" />
 
         </LinearLayout>
         <Button

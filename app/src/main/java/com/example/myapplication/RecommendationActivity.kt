@@ -1,9 +1,17 @@
 package com.example.myapplication
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.CheckBox
+import com.android.volley.AuthFailureError
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
+import com.google.firebase.database.*
 
 class RecommendationActivity : AppCompatActivity() {
 
@@ -15,6 +23,13 @@ class RecommendationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recommendation)
         val token = intent.getStringExtra("TOKEN_KEY")
+
+        val queue = Volley.newRequestQueue(this)
+        val url = "https://api.spotify.com/v1/me"
+        var email=""
+
+
+
 
         // Find all the checkboxes by their IDs and add them to separate lists
         checkBoxList1 = mutableListOf(
@@ -56,27 +71,102 @@ class RecommendationActivity : AppCompatActivity() {
             findViewById(R.id.checkbox3_10)
         )
 
-        // Set a listener for when any of the checkboxes are clicked
-        val checkboxClickListener = View.OnClickListener { view ->
-            if (view is CheckBox) {
-                val isChecked = view.isChecked
 
-                // Find which list the checkbox belongs to and update the list accordingly
-                if (checkBoxList1.any { it.id == view.id }) {
-                    checkBoxList1.forEach { it.isChecked = isChecked }
-                } else if (checkBoxList2.any { it.id == view.id }) {
-                    checkBoxList2.forEach { it.isChecked = isChecked }
-                } else if (checkBoxList3.any { it.id == view.id }) {
-                    checkBoxList3.forEach { it.isChecked = isChecked }
+
+        val submitButton = findViewById<Button>(R.id.submit_button)
+
+        submitButton.setOnClickListener {
+            val preferences : List<String> = parsePrefs()
+            val request = object : JsonObjectRequest(
+                Method.GET, url, null,
+                Response.Listener { response ->
+                    email = response.getString("email")
+                    // Get a reference to the Firebase Realtime Database
+                    val database = FirebaseDatabase.getInstance().reference
+
+                    // Check if the email already exists in the database
+                    val query: Query = database.child("emails").orderByChild("email").equalTo(email)
+                    query.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(dataSnapshot: DataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                // Email already exists in the database
+                                Log.i("FIREBASE", "Email already exists")
+                                // Get the key of the existing email node
+                                val emailNode = dataSnapshot.children.first()
+                                val emailKey = emailNode.key ?: ""
+                                // Save the "preferences" string for the existing email node
+                                val prefValues = hashMapOf<String, Any>(
+                                    "BRIGHT" to preferences[0],
+                                    "MEDIUM" to preferences[1],
+                                    "DARK" to preferences[2]
+                                )
+                                val childUpdates = hashMapOf<String, Any>("/emails/$emailKey/preferences" to prefValues)
+                                database.updateChildren(childUpdates)
+                            } else {
+                                // Email doesn't exist in the database, create a new node and save "preferences"
+                                val key: String = database.child("emails").push().key ?: ""
+//                                val emailValues = hashMapOf<String, Any>(
+//                                    "email" to email
+//                                )
+                                val emailNode = database.child("emails").child(key)
+                                emailNode.child("email").setValue(email)
+                                emailNode.child("preferences").child("BRIGHT").setValue(preferences[0])
+                                emailNode.child("preferences").child("MEDIUM").setValue(preferences[1])
+                                emailNode.child("preferences").child("DARK").setValue(preferences[2])
+
+//                                val childUpdates = hashMapOf<String, Any>("/emails/$key" to emailValues)
+//                                database.updateChildren(childUpdates)
+
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            // Handle error
+                        }
+                    })
+                    Log.i("SubmitButton", "Submit button clicked; User email: $email")
+                },
+                Response.ErrorListener { error ->
+                    Log.e("SPOTIFY", "Error getting user email: ${error.message}")
+                }) {
+                @Throws(AuthFailureError::class)
+                override fun getHeaders(): Map<String, String> {
+                    val headers = HashMap<String, String>()
+                    headers["Authorization"] = "Bearer $token"
+                    return headers
                 }
+            }
+            queue.add(request)
+
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    private fun parsePrefs(): List<String> {
+        var brightStr: String = ""
+        var mediumStr: String = ""
+        var darkStr: String = ""
+        //Log.i("MY_TAG", checkBoxList1[0].isChecked.toString())
+        for(i in 0..9){
+            if(checkBoxList1[i].isChecked){
+                brightStr = brightStr.plus(checkBoxList1[i].text.toString()).plus(".")
+            }
+            if(checkBoxList2[i].isChecked){
+                mediumStr = mediumStr.plus(checkBoxList2[i].text.toString()).plus(".")
+            }
+            if(checkBoxList3[i].isChecked){
+                darkStr = darkStr.plus(checkBoxList3[i].text.toString()).plus(".")
             }
         }
 
-
-        // Set the listener for all the checkboxes
-        checkBoxList1.forEach { it.setOnClickListener(checkboxClickListener) }
-        checkBoxList2.forEach { it.setOnClickListener(checkboxClickListener) }
-        checkBoxList3.forEach { it.setOnClickListener(checkboxClickListener) }
+        /*
+        Returns list where:
+            ret[0] -> Bright Prefs
+            ret[1] -> Medium Prefs
+            ret[2] -> Dark Prefs
+         */
+        return listOf<String>(brightStr,mediumStr,darkStr)
     }
 
     /*fun getSelectedCheckboxes(): List<String> {

@@ -11,4 +11,15 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="genre1">Rock</string>
+    <string name="genre2">Pop</string>
+    <string name="genre3">Jazz</string>
+    <string name="genre4">Instrumental</string>
+    <string name="genre5">Country</string>
+    <string name="genre6">Alternative Rock</string>
+    <string name="genre7">Hip-Hop</string>
+    <string name="genre8">EDM</string>
+    <string name="genre9">R&amp;B</string>
+    <string name="genre10">Whatever</string>
 </resources>

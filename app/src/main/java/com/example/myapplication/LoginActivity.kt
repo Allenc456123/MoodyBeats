@@ -58,7 +58,7 @@ class LoginActivity : AppCompatActivity() {
                     val token = response.accessToken
                     Log.d("AUTHENTICATION", "Got Spotify access token: $token")
                     // Save token to SharedPreferences or use it to make API requests
-                    val intent = Intent(this, HomeActivity::class.java)
+                    val intent = Intent(this, RecommendationActivity::class.java)
                     intent.putExtra("TOKEN_KEY", token)
                     startActivity(intent)
                 }
