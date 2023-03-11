@@ -18,14 +18,17 @@
         android:theme="@style/Theme.MyApplication.NoActionBar"
         tools:targetApi="31">
         <activity
+            android:screenOrientation="portrait"
             android:name=".RecommendationActivity"
             android:exported="false" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".HomeActivity"
             android:exported="false"
             android:label="@string/title_activity_home"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.MyApplication.NoActionBar">
