@@ -86,6 +86,8 @@ class RecommendationActivity : AppCompatActivity() {
                     val database = FirebaseDatabase.getInstance().reference
 
                     // Check if the email already exists in the database
+                    //If email already exists then update the existing preferences with new
+                    //U from CRUD
                     val query: Query = database.child("emails").orderByChild("email").equalTo(email)
                     query.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -106,6 +108,7 @@ class RecommendationActivity : AppCompatActivity() {
                                 val childUpdates = hashMapOf<String, Any>("/emails/$emailKey/preferences" to prefValues)
                                 database.updateChildren(childUpdates)
                             } else {
+                                //C from CRUD
                                 // Email doesn't exist in the database, create a new node and save "preferences"
                                 val key: String = database.child("emails").push().key ?: ""
 //                                val emailValues = hashMapOf<String, Any>(

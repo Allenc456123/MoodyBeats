@@ -26,13 +26,15 @@ class HomeActivity : AppCompatActivity() {
     private val playFragment = PlayFragment()
     private val recommendFragment = RecommendFragment()
     private val libraryFragment = LibraryFragment()
-
+    private val profileFragment = ProfileFragment()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         val database = FirebaseDatabase.getInstance().reference
         val email = intent.getStringExtra("EMAIL") ?: ""
         Log.i("pref","email got???${email}")
+        //Get Preferences from database for recommendation logic
+        //R from CRUD
         val query: Query = database.child("emails").orderByChild("email").equalTo(email)
         query.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -46,7 +48,6 @@ class HomeActivity : AppCompatActivity() {
                     Log.i("pref",brightPref+mediumPref+darkPref)
                 }
             }
-
             override fun onCancelled(error: DatabaseError) {
                 // Handle error
             }
@@ -77,6 +78,11 @@ class HomeActivity : AppCompatActivity() {
                     }
                     R.id.library -> {
                         supportFragmentManager.beginTransaction().replace(R.id.container, libraryFragment).commit()
+                        return true
+                    }
+                    R.id.profile -> {
+                        profileFragment.setEmail(email)
+                        supportFragmentManager.beginTransaction().replace(R.id.container, profileFragment).commit()
                         return true
                     }
                 }
