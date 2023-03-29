@@ -22,7 +22,10 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val builder = AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI)
-        builder.setScopes(arrayOf("streaming, user-read-email"))
+        builder.setScopes(arrayOf("streaming, user-read-email, playlist-read-private, " +
+                "playlist-read-collaborative, " +
+                "playlist-modify-private, " +
+                "playlist-modify-public"))
         val request = builder.build()
         setContentView(R.layout.activity_login)
 

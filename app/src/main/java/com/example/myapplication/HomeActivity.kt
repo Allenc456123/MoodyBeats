@@ -46,15 +46,12 @@ class HomeActivity : AppCompatActivity() {
                 if (!playlistNames.contains(targetName)) {
                     Log.i("myTag","createPlaylist is called for ${targetName}")
                     createPlaylist(accessToken, userID, targetName)
+                } else {
+                    Log.i("myTag","${targetName} already exists")
                 }
             }
 
         }
-
-
-
-
-
 
         //Get Preferences from database for recommendation logic
         //R from CRUD
@@ -169,9 +166,9 @@ class HomeActivity : AppCompatActivity() {
         val responseCode = connection.responseCode
         if (responseCode != HttpsURLConnection.HTTP_CREATED) {
             Log.e("CreatePlaylist", "HTTP error code: $responseCode")
-
-
+//            Log.i("myTag", "Response body: ${connection.responseCode.}")
             throw RuntimeException("Failed to create playlist")
+
         }
     }
 
