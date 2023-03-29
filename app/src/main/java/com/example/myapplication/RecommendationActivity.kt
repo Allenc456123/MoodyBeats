@@ -92,6 +92,7 @@ class RecommendationActivity : AppCompatActivity() {
                     query.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(dataSnapshot: DataSnapshot) {
                             intent.putExtra("EMAIL", email)
+                            intent.putExtra("TOKEN", token)
                             startActivity(intent)
                             if (dataSnapshot.exists()) {
                                 // Email already exists in the database

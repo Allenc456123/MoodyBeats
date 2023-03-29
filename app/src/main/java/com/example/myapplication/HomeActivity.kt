@@ -1,24 +1,16 @@
 package com.example.myapplication
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import com.android.volley.AuthFailureError
-import com.android.volley.Response
-import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
-import org.json.JSONObject
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import com.example.myapplication.databinding.ActivityHomeBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import com.google.firebase.database.*
+import com.spotify.android.appremote.api.Connector
+import com.spotify.android.appremote.api.SpotifyAppRemote
+import com.spotify.protocol.client.CallResult
+
 
 class HomeActivity : AppCompatActivity() {
 
@@ -27,12 +19,16 @@ class HomeActivity : AppCompatActivity() {
     private val recommendFragment = RecommendFragment()
     private val libraryFragment = LibraryFragment()
     private val profileFragment = ProfileFragment()
+    private lateinit var spotifyAppRemote: SpotifyAppRemote
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         val database = FirebaseDatabase.getInstance().reference
         val email = intent.getStringExtra("EMAIL") ?: ""
         Log.i("pref","email got???${email}")
+        val accessToken  = intent.getStringExtra("TOKEN") // retrieve the access token for the user
+        Log.i("token", "token got???${accessToken}")
+
         //Get Preferences from database for recommendation logic
         //R from CRUD
         val query: Query = database.child("emails").orderByChild("email").equalTo(email)
