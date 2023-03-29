@@ -4,12 +4,19 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import com.google.firebase.database.*
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.spotify.protocol.client.CallResult
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.net.URL
+import javax.net.ssl.HttpsURLConnection
 
 
 class HomeActivity : AppCompatActivity() {
@@ -20,6 +27,8 @@ class HomeActivity : AppCompatActivity() {
     private val libraryFragment = LibraryFragment()
     private val profileFragment = ProfileFragment()
     private lateinit var spotifyAppRemote: SpotifyAppRemote
+    private lateinit var playlistNames: Map<String,String>
+    private lateinit var userID: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -27,7 +36,25 @@ class HomeActivity : AppCompatActivity() {
         val email = intent.getStringExtra("EMAIL") ?: ""
         Log.i("pref","email got???${email}")
         val accessToken  = intent.getStringExtra("TOKEN") // retrieve the access token for the user
-        Log.i("token", "token got???${accessToken}")
+        Log.i("token", "token got???${accessToken}");
+        val targetNames = listOf("MoodyBeats-Dark", "MoodyBeats-Bright", "MoodyBeats-Medium")
+
+        lifecycleScope.launch {
+            playlistNames = getPlaylistNames(accessToken)
+            userID = getUserId(accessToken)
+            targetNames.forEach { targetName ->
+                if (!playlistNames.contains(targetName)) {
+                    Log.i("myTag","createPlaylist is called for ${targetName}")
+                    createPlaylist(accessToken, userID, targetName)
+                }
+            }
+
+        }
+
+
+
+
+
 
         //Get Preferences from database for recommendation logic
         //R from CRUD
@@ -86,6 +113,83 @@ class HomeActivity : AppCompatActivity() {
                 return false
             }
         })
+    }
+
+
+    //Returns map of form <Key = PlaylistName, Value = PlaylistID>
+    suspend fun getPlaylistNames(accessToken: String?): Map<String, String> = withContext(Dispatchers.IO) {
+        Log.i("myTag","getPlayListName has been entered")
+        val playlistUrl = "https://api.spotify.com/v1/me/playlists"
+        val url = URL(playlistUrl)
+        val connection = url.openConnection() as HttpsURLConnection
+        connection.requestMethod = "GET"
+        connection.setRequestProperty("Authorization", "Bearer $accessToken")
+
+        val responseCode = connection.responseCode
+        if (responseCode == HttpsURLConnection.HTTP_OK) {
+            val response = connection.inputStream.bufferedReader().use { it.readText() }
+            val jsonResponse = JSONObject(response)
+            val playlists = jsonResponse.getJSONArray("items")
+            val playlistMap = mutableMapOf<String, String>()
+
+            for (i in 0 until playlists.length()) {
+                val playlist = playlists.getJSONObject(i)
+                val playlistName = playlist.getString("name")
+                val playlistID = playlist.getString("id")
+                playlistMap[playlistName] = playlistID
+            }
+
+            Log.i("myTag","getPlayListNamesMap is returning")
+            return@withContext playlistMap
+        } else {
+            Log.e("GetPlaylistNamesMap", "HTTP error code: $responseCode")
+            Log.i("myTag","getPlayListNamesMap is returning")
+            return@withContext emptyMap()
+        }
+    }
+
+    suspend fun createPlaylist(accessToken: String?, userId: String, playlistName: String) = withContext(Dispatchers.IO) {
+        Log.i("myTag", "createPlaylist: accessToken is ${accessToken}")
+        Log.i("myTag", "createPlaylist: userId is ${userId}")
+        Log.i("myTag", "createPlaylist: playlistName is ${playlistName}")
+        val url = URL("https://api.spotify.com/v1/users/$userId/playlists")
+        val connection = url.openConnection() as HttpsURLConnection
+        connection.requestMethod = "POST"
+        connection.setRequestProperty("Authorization", "Bearer $accessToken")
+        connection.setRequestProperty("Content-Type", "application/json")
+
+        val postData = JSONObject()
+        postData.put("name", playlistName)
+        postData.put("description", "Created by the MoodyBeats app")
+        val requestBody = postData.toString().toByteArray(Charsets.UTF_8)
+
+        connection.doOutput = true
+        connection.outputStream.write(requestBody)
+
+        val responseCode = connection.responseCode
+        if (responseCode != HttpsURLConnection.HTTP_CREATED) {
+            Log.e("CreatePlaylist", "HTTP error code: $responseCode")
+
+
+            throw RuntimeException("Failed to create playlist")
+        }
+    }
+
+    suspend fun getUserId(accessToken: String?): String = withContext(Dispatchers.IO) {
+        val url = URL("https://api.spotify.com/v1/me")
+        val connection = url.openConnection() as HttpsURLConnection
+        connection.requestMethod = "GET"
+        connection.setRequestProperty("Authorization", "Bearer $accessToken")
+
+        val responseCode = connection.responseCode
+        if (responseCode == HttpsURLConnection.HTTP_OK) {
+            val response = connection.inputStream.bufferedReader().use { it.readText() }
+            val jsonResponse = JSONObject(response)
+            return@withContext jsonResponse.getString("id")
+        } else {
+            Log.e("GetUserId", "HTTP error code: $responseCode")
+            throw RuntimeException("Failed to get user ID")
+        }
     }
 
     override fun onStart() {
