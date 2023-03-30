@@ -37,6 +37,8 @@ class HomeActivity : AppCompatActivity() {
         Log.i("pref","email got???${email}")
         val accessToken  = intent.getStringExtra("TOKEN") // retrieve the access token for the user
         Log.i("token", "token got???${accessToken}");
+        val bundle = Bundle()
+        bundle.putString("accessToken", accessToken)
         val targetNames = listOf("MoodyBeats-Dark", "MoodyBeats-Bright", "MoodyBeats-Medium")
 
         lifecycleScope.launch {
@@ -93,6 +95,7 @@ class HomeActivity : AppCompatActivity() {
                         return true
                     }
                     R.id.recommend -> {
+                        recommendFragment.arguments = bundle
                         supportFragmentManager.beginTransaction().replace(R.id.container, recommendFragment).commit()
                         return true
                     }
