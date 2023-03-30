@@ -29,6 +29,9 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var spotifyAppRemote: SpotifyAppRemote
     private lateinit var playlistNames: Map<String,String>
     private lateinit var userID: String
+    private lateinit var brightPref: String
+    private lateinit var mediumPref: String
+    private lateinit var darkPref: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -63,10 +66,13 @@ class HomeActivity : AppCompatActivity() {
                 if (dataSnapshot.exists()) {
                     val emailNode = dataSnapshot.children.first()
                     val preferencesNode = emailNode.child("preferences")
-                    val brightPref = preferencesNode.child("BRIGHT").value.toString()
-                    val mediumPref = preferencesNode.child("MEDIUM").value.toString()
-                    val darkPref = preferencesNode.child("DARK").value.toString()
+                    brightPref = preferencesNode.child("BRIGHT").value.toString()
+                    mediumPref = preferencesNode.child("MEDIUM").value.toString()
+                    darkPref = preferencesNode.child("DARK").value.toString()
                     // Do something with the preferences values
+                    bundle.putString("bright", brightPref)
+                    bundle.putString("medium", mediumPref)
+                    bundle.putString("dark", darkPref)
                     Log.i("pref",brightPref+mediumPref+darkPref)
                 }
             }

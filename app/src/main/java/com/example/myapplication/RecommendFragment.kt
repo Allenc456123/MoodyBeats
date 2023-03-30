@@ -14,12 +14,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.lifecycleScope
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -27,9 +22,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.URL
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.LinkedBlockingQueue
 import javax.net.ssl.HttpsURLConnection
+import android.content.Context.SENSOR_SERVICE
 
 
 
@@ -45,11 +39,13 @@ class RecommendFragment : Fragment() {
     private lateinit var mtvSongName: TextView
     private lateinit var mtvArtistName: TextView
     private lateinit var mivAlbumPic: ImageView
+    private lateinit var mBtnAdd : Button
 
     private lateinit var recommendedTracks: List<Song>
 
     private lateinit var sensorManager: SensorManager
-    private lateinit var lightSensor: Sensor
+    private var lightSensor: Sensor? = null
+    private var currentLightLevel: Float = 0f
     var genres ="pop,classical,jazz"
     data class Song(
         val name: String,
@@ -68,22 +64,41 @@ class RecommendFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val accessToken = arguments?.getString("accessToken")
         var currentIndex = 0
+
+        val darkP : String? = arguments?.getString("dark")
+        val mediumP : String? = arguments?.getString("medium")
+        val brightP : String? = arguments?.getString("bright")
+        Log.i("myTag", brightP.toString())
         // Here you can access your views and add your logic
         mBtnCheckLight = view.findViewById<Button>(R.id.getSong)
         mtvSongName = view.findViewById(R.id.songName)
         mtvArtistName = view.findViewById(R.id.artist)
         mivAlbumPic = view.findViewById(R.id.albumPic)
+        mBtnAdd = view.findViewById(R.id.btnAdd)
         mtvLightVal = view.findViewById<TextView>(R.id.lightVal)
 
-        sensorManager = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        sensorManager = requireActivity().getSystemService(Context.SENSOR_SERVICE) as SensorManager
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
+
         recommendedTracks = emptyList()
         mBtnCheckLight.setOnClickListener {
-            var measure = measureAmbientLight()
-            mtvLightVal.text = measure.toString()
+            currentLightLevel = measureAmbientLight()
+            Log.i("myTag", currentLightLevel.toString())
+            mtvLightVal.text = currentLightLevel.toString()
             if (recommendedTracks.isEmpty() || currentIndex >= recommendedTracks.size) {
                 lifecycleScope.launch {
-                    recommendedTracks = getSongRecommendations(accessToken, genres)
+                    Log.i("myTag","TEST")
+                    if(currentLightLevel < 5){
+                        Log.i("myTag","Getting dark prefs")
+                        recommendedTracks = getSongRecommendations(accessToken, darkP)
+                    } else if(currentLightLevel >= 5 && currentLightLevel < 20){
+                        Log.i("myTag","Getting medium prefs")
+                        recommendedTracks = getSongRecommendations(accessToken, mediumP)
+                    } else {
+                        Log.i("myTag","Getting bright prefs")
+                        recommendedTracks = getSongRecommendations(accessToken, brightP)
+                    }
+
                     currentIndex = 0
                     if (recommendedTracks.isNotEmpty()) {
                         displaySong(currentIndex)
@@ -95,6 +110,14 @@ class RecommendFragment : Fragment() {
                 displaySong(currentIndex)
             }
         }
+
+        mBtnAdd.setOnClickListener {
+            if(recommendedTracks.size > 0){
+                //add recommendedTracks[currentIndex] to according playlist
+            }
+        }
+
+
     }
 
     private fun displaySong(index: Int) {
@@ -109,47 +132,7 @@ class RecommendFragment : Fragment() {
     }
 
 
-//    fun measureAmbientLight(context: Context): Float {
-//        val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-//        val lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
-//        var lightValue = -1.0f
-//
-//        val sensorListener = object : SensorEventListener {
-//            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
-//
-//            override fun onSensorChanged(event: SensorEvent?) {
-//                if (event?.sensor?.type == Sensor.TYPE_LIGHT) {
-//                    lightValue = event.values[0]
-//                    sensorManager.unregisterListener(this)
-//                }
-//            }
-//        }
-//
-//        sensorManager.registerListener(sensorListener, lightSensor, SensorManager.SENSOR_DELAY_NORMAL)
-//
-//        // Wait for the sensor to return a value
-//        while (lightValue < 0.0f) {
-//            Thread.sleep(50)
-//        }
-//
-//        return lightValue
-//    }
-
-    private fun measureAmbientLight() {
-        sensorManager.registerListener(sensorListener, lightSensor, SensorManager.SENSOR_DELAY_NORMAL)
-    }
-
-    private val sensorListener = object : SensorEventListener {
-        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
-
-        override fun onSensorChanged(event: SensorEvent?) {
-            if (event?.sensor?.type == Sensor.TYPE_LIGHT) {
-                val lightValue = event.values[0]
-                mtvLightVal.text = lightValue.toString()
-            }
-        }
-    }
-    suspend fun getSongRecommendations(accessToken: String?, genres: String): List<Song> = withContext(Dispatchers.IO) {
+    suspend fun getSongRecommendations(accessToken: String?, genres: String?): List<Song> = withContext(Dispatchers.IO) {
         val recommendationUrl = "https://api.spotify.com/v1/recommendations?seed_genres=$genres"
         val url = URL(recommendationUrl)
         val connection = url.openConnection() as HttpsURLConnection
@@ -180,13 +163,33 @@ class RecommendFragment : Fragment() {
         }
     }
 
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        sensorManager.unregisterListener(sensorListener)
+    private fun measureAmbientLight(): Float {
+        return currentLightLevel
     }
 
+    override fun onResume() {
+        super.onResume()
+        lightSensor?.let {
+            sensorManager.registerListener(lightSensorListener, it, SensorManager.SENSOR_DELAY_NORMAL)
+        }
+    }
 
+    override fun onPause() {
+        super.onPause()
+        sensorManager.unregisterListener(lightSensorListener)
+    }
+
+    private val lightSensorListener = object : SensorEventListener {
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+
+        override fun onSensorChanged(event: SensorEvent?) {
+            event?.let {
+                if (it.sensor.type == Sensor.TYPE_LIGHT) {
+                    currentLightLevel = event.values[0]
+                }
+            }
+        }
+    }
 
 
 

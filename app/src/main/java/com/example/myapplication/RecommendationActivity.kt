@@ -12,6 +12,8 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.google.firebase.database.*
+import java.util.*
+import kotlin.collections.HashMap
 
 class RecommendationActivity : AppCompatActivity() {
 
@@ -155,13 +157,13 @@ class RecommendationActivity : AppCompatActivity() {
         //Log.i("MY_TAG", checkBoxList1[0].isChecked.toString())
         for(i in 0..9){
             if(checkBoxList1[i].isChecked){
-                brightStr = brightStr.plus(checkBoxList1[i].text.toString()).plus(".")
+                brightStr = brightStr.plus(checkBoxList1[i].text.toString().lowercase()).plus(",")
             }
             if(checkBoxList2[i].isChecked){
-                mediumStr = mediumStr.plus(checkBoxList2[i].text.toString()).plus(".")
+                mediumStr = mediumStr.plus(checkBoxList2[i].text.toString().lowercase()).plus(",")
             }
             if(checkBoxList3[i].isChecked){
-                darkStr = darkStr.plus(checkBoxList3[i].text.toString()).plus(".")
+                darkStr = darkStr.plus(checkBoxList3[i].text.toString().lowercase()).plus(",")
             }
         }
 
@@ -171,7 +173,7 @@ class RecommendationActivity : AppCompatActivity() {
             ret[1] -> Medium Prefs
             ret[2] -> Dark Prefs
          */
-        return listOf<String>(brightStr,mediumStr,darkStr)
+        return listOf<String>(brightStr.substring(0,brightStr.length-1),mediumStr.substring(0,mediumStr.length-1),darkStr.substring(0,darkStr.length-1))
     }
 
     /*fun getSelectedCheckboxes(): List<String> {
