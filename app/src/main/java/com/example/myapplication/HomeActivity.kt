@@ -46,16 +46,21 @@ class HomeActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             playlistNames = getPlaylistNames(accessToken)
+
             userID = getUserId(accessToken)
             targetNames.forEach { targetName ->
                 if (!playlistNames.contains(targetName)) {
                     Log.i("myTag","createPlaylist is called for ${targetName}")
                     createPlaylist(accessToken, userID, targetName)
+
                 } else {
                     Log.i("myTag","${targetName} already exists")
                 }
             }
-
+            playlistNames = getPlaylistNames(accessToken)
+            bundle.putString("darkID",playlistNames.get("MoodyBeats-Dark"));
+            bundle.putString("brightID",playlistNames.get("MoodyBeats-Bright"));
+            bundle.putString("mediumID",playlistNames.get("MoodyBeats-Medium"));
         }
 
         //Get Preferences from database for recommendation logic

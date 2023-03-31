@@ -46,10 +46,10 @@ class RecommendFragment : Fragment() {
     private lateinit var sensorManager: SensorManager
     private var lightSensor: Sensor? = null
     private var currentLightLevel: Float = 0f
-    var genres ="pop,classical,jazz"
+    var playlistFlag=-1
     data class Song(
         val name: String,
-        val id: String,
+        val uri: String,
         val artist: String,
         val albumImageUrl: String
     )
@@ -64,6 +64,9 @@ class RecommendFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val accessToken = arguments?.getString("accessToken")
         var currentIndex = 0
+        val darkID = arguments?.getString("darkID")
+        val brightID = arguments?.getString("brightID")
+        val mediumID = arguments?.getString("mediumID")
 
         val darkP : String? = arguments?.getString("dark")
         val mediumP : String? = arguments?.getString("medium")
@@ -84,19 +87,25 @@ class RecommendFragment : Fragment() {
         mBtnCheckLight.setOnClickListener {
             currentLightLevel = measureAmbientLight()
             Log.i("myTag", currentLightLevel.toString())
-            mtvLightVal.text = currentLightLevel.toString()
-            if (recommendedTracks.isEmpty() || currentIndex >= recommendedTracks.size) {
+
+            if (recommendedTracks.isEmpty()) {
                 lifecycleScope.launch {
                     Log.i("myTag","TEST")
                     if(currentLightLevel < 5){
                         Log.i("myTag","Getting dark prefs")
                         recommendedTracks = getSongRecommendations(accessToken, darkP)
+                        mtvLightVal.text = "Light Value: "+currentLightLevel.toString()+" Playlist: Dark"
+                        playlistFlag=1
                     } else if(currentLightLevel >= 5 && currentLightLevel < 20){
                         Log.i("myTag","Getting medium prefs")
                         recommendedTracks = getSongRecommendations(accessToken, mediumP)
+                        mtvLightVal.text = "Light Value: "+currentLightLevel.toString()+" Playlist: Medium"
+                        playlistFlag=2
                     } else {
                         Log.i("myTag","Getting bright prefs")
                         recommendedTracks = getSongRecommendations(accessToken, brightP)
+                        mtvLightVal.text = "Light Value: "+currentLightLevel.toString()+" Playlist: Bright"
+                        playlistFlag=3
                     }
 
                     currentIndex = 0
@@ -107,13 +116,65 @@ class RecommendFragment : Fragment() {
                 }
             } else {
                 currentIndex++
-                displaySong(currentIndex)
+                if(!recommendedTracks.isEmpty()) {
+                    displaySong(currentIndex)
+                }
             }
         }
 
         mBtnAdd.setOnClickListener {
-            if(recommendedTracks.size > 0){
+            if(playlistFlag!=-1){
                 //add recommendedTracks[currentIndex] to according playlist
+                lifecycleScope.launch {
+
+                    when (playlistFlag) {
+                        1 -> {
+                            val success = addSongToPlaylist(accessToken, darkID, recommendedTracks[currentIndex].uri)
+                            Log.i("playlistAdd", "dark "+success.toString())
+                        }
+                        2 -> {
+                            val success = addSongToPlaylist(accessToken, mediumID, recommendedTracks[currentIndex].uri)
+                            Log.i("playlistAdd", "medium "+success.toString())
+                        }
+                        3 -> {
+                            val success = addSongToPlaylist(accessToken, brightID, recommendedTracks[currentIndex].uri)
+                            Log.i("playlistAdd", "bright "+success.toString())
+                        }
+                    }
+                }
+                if (recommendedTracks.isEmpty()) {
+                    lifecycleScope.launch {
+                        Log.i("myTag","TEST")
+                        if(currentLightLevel < 5){
+                            Log.i("myTag","Getting dark prefs")
+                            recommendedTracks = getSongRecommendations(accessToken, darkP)
+                            mtvLightVal.text = "Light Value: "+currentLightLevel.toString()+" Playlist: Dark"
+                            playlistFlag=1
+                        } else if(currentLightLevel >= 5 && currentLightLevel < 20){
+                            Log.i("myTag","Getting medium prefs")
+                            recommendedTracks = getSongRecommendations(accessToken, mediumP)
+                            mtvLightVal.text = "Light Value: "+currentLightLevel.toString()+" Playlist: Medium"
+                            playlistFlag=2
+                        } else {
+                            Log.i("myTag","Getting bright prefs")
+                            recommendedTracks = getSongRecommendations(accessToken, brightP)
+                            mtvLightVal.text = "Light Value: "+currentLightLevel.toString()+" Playlist: Bright"
+                            playlistFlag=3
+                        }
+
+                        currentIndex = 0
+                        if (recommendedTracks.isNotEmpty()) {
+                            displaySong(currentIndex)
+                            delay(1000)
+                        }
+                    }
+                } else {
+                    currentIndex++
+                    if(!recommendedTracks.isEmpty()) {
+                        displaySong(currentIndex)
+                    }
+                }
+
             }
         }
 
@@ -129,6 +190,21 @@ class RecommendFragment : Fragment() {
         Picasso.get().load(song.albumImageUrl).into(mivAlbumPic) // load album image using Picasso library
         mtvSongName.text = song.name
         mtvArtistName.text = song.artist
+    }
+    suspend fun addSongToPlaylist(accessToken: String?, playlistId: String?, songURI: String?): Boolean = withContext(Dispatchers.IO) {
+        val addSongUrl = "https://api.spotify.com/v1/playlists/$playlistId/tracks?uris=$songURI"
+        val url = URL(addSongUrl)
+        val connection = url.openConnection() as HttpsURLConnection
+        connection.requestMethod = "POST"
+        connection.setRequestProperty("Authorization", "Bearer $accessToken")
+
+        val responseCode = connection.responseCode
+        if (responseCode == HttpsURLConnection.HTTP_CREATED) {
+            return@withContext true
+        } else {
+            Log.e("AddSongToPlaylist", "HTTP error code: $responseCode")
+            return@withContext false
+        }
     }
 
 
@@ -149,10 +225,10 @@ class RecommendFragment : Fragment() {
             for (i in 0 until tracks.length()) {
                 val track = tracks.getJSONObject(i)
                 val songName = track.getString("name")
-                val songId = track.getString("id")
+                val songURI = track.getString("uri")
                 val artistName = track.getJSONArray("artists").getJSONObject(0).getString("name")
                 val albumImageUrl = track.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url")
-                val song = Song(songName, songId, artistName, albumImageUrl)
+                val song = Song(songName, songURI, artistName, albumImageUrl)
                 songList.add(song)
             }
 
