@@ -125,23 +125,6 @@ class RecommendFragment : Fragment() {
         mBtnAdd.setOnClickListener {
             if(playlistFlag!=-1){
                 //add recommendedTracks[currentIndex] to according playlist
-                lifecycleScope.launch {
-
-                    when (playlistFlag) {
-                        1 -> {
-                            val success = addSongToPlaylist(accessToken, darkID, recommendedTracks[currentIndex].uri)
-                            Log.i("playlistAdd", "dark "+success.toString())
-                        }
-                        2 -> {
-                            val success = addSongToPlaylist(accessToken, mediumID, recommendedTracks[currentIndex].uri)
-                            Log.i("playlistAdd", "medium "+success.toString())
-                        }
-                        3 -> {
-                            val success = addSongToPlaylist(accessToken, brightID, recommendedTracks[currentIndex].uri)
-                            Log.i("playlistAdd", "bright "+success.toString())
-                        }
-                    }
-                }
                 if (recommendedTracks.isEmpty()) {
                     lifecycleScope.launch {
                         Log.i("myTag","TEST")
@@ -169,6 +152,22 @@ class RecommendFragment : Fragment() {
                         }
                     }
                 } else {
+                    lifecycleScope.launch {
+                        when (playlistFlag) {
+                            1 -> {
+                                val success = addSongToPlaylist(accessToken, darkID, recommendedTracks[currentIndex].uri)
+                                Log.i("playlistAdd", "dark "+success.toString())
+                            }
+                            2 -> {
+                                val success = addSongToPlaylist(accessToken, mediumID, recommendedTracks[currentIndex].uri)
+                                Log.i("playlistAdd", "medium "+success.toString())
+                            }
+                            3 -> {
+                                val success = addSongToPlaylist(accessToken, brightID, recommendedTracks[currentIndex].uri)
+                                Log.i("playlistAdd", "bright "+success.toString())
+                            }
+                        }
+                    }
                     currentIndex++
                     if(!recommendedTracks.isEmpty()) {
                         displaySong(currentIndex)

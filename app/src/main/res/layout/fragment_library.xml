@@ -1,16 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LibraryFragment">
+    android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <!--Top buttons-->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Library Fragment"
-        android:textColor="@color/white"
-        android:textSize="25dp" />
+        android:orientation="horizontal"
+        android:gravity="center">
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/btn_dark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dark"/>
+
+        <Button
+            android:id="@+id/btn_medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Medium"/>
+
+        <Button
+            android:id="@+id/btn_bright"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bright"/>
+
+    </LinearLayout>
+
+    <!--Playlist-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/playlist_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

@@ -22,7 +22,6 @@ import javax.net.ssl.HttpsURLConnection
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var bottomNavigationView: BottomNavigationView
-    private val playFragment = PlayFragment()
     private val recommendFragment = RecommendFragment()
     private val libraryFragment = LibraryFragment()
     private val profileFragment = ProfileFragment()
@@ -96,21 +95,19 @@ class HomeActivity : AppCompatActivity() {
         bottomNavigationView=findViewById(R.id.bottom_navigationBar)
 
 
-        supportFragmentManager.beginTransaction().replace(R.id.container, playFragment).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.container, recommendFragment).commit()
 
         bottomNavigationView.setOnItemSelectedListener(object : NavigationBarView.OnItemSelectedListener {
             override fun onNavigationItemSelected(item: MenuItem): Boolean {
                 when (item.itemId) {
-                    R.id.play -> {
-                        supportFragmentManager.beginTransaction().replace(R.id.container, playFragment).commit()
-                        return true
-                    }
+
                     R.id.recommend -> {
                         recommendFragment.arguments = bundle
                         supportFragmentManager.beginTransaction().replace(R.id.container, recommendFragment).commit()
                         return true
                     }
                     R.id.library -> {
+                        libraryFragment.arguments=bundle
                         supportFragmentManager.beginTransaction().replace(R.id.container, libraryFragment).commit()
                         return true
                     }
