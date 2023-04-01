@@ -12,7 +12,14 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.google.firebase.database.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.net.URL
 import java.util.*
+import javax.net.ssl.HttpsURLConnection
 import kotlin.collections.HashMap
 
 class RecommendationActivity : AppCompatActivity() {
@@ -25,10 +32,6 @@ class RecommendationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recommendation)
         val token = intent.getStringExtra("TOKEN_KEY")
-
-        val queue = Volley.newRequestQueue(this)
-        val url = "https://api.spotify.com/v1/me"
-        var email=""
         val intent = Intent(this, HomeActivity::class.java)
 
 
@@ -79,75 +82,57 @@ class RecommendationActivity : AppCompatActivity() {
         val submitButton = findViewById<Button>(R.id.submit_button)
 
         submitButton.setOnClickListener {
-            val preferences : List<String> = parsePrefs()
-            val request = object : JsonObjectRequest(
-                Method.GET, url, null,
-                Response.Listener { response ->
-                    email = response.getString("email")
-                    // Get a reference to the Firebase Realtime Database
-                    val database = FirebaseDatabase.getInstance().reference
+            val preferences: List<String> = parsePrefs()
+            GlobalScope.launch(Dispatchers.Main) {
+                Log.i("SubmitButton", "token"+"$token")
+                val email = getUserEmail(token)
+                Log.i("SubmitButton", "Submit button clicked; User email: $email")
+                // Get a reference to the Firebase Realtime Database
+                val database = FirebaseDatabase.getInstance().reference
+                // Check if the email already exists in the database
+                //If email already exists then update the existing preferences with new
+                //U from CRUD
+                val query: Query = database.child("emails").orderByChild("email").equalTo(email)
+                query.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        intent.putExtra("EMAIL", email)
+                        intent.putExtra("TOKEN", token)
+                        startActivity(intent)
+                        if (dataSnapshot.exists()) {
+                            // Email already exists in the database
+                            Log.i("FIREBASE", "Email already exists")
+                            // Get the key of the existing email node
+                            val emailNode = dataSnapshot.children.first()
+                            val emailKey = emailNode.key ?: ""
+                            // Save the "preferences" string for the existing email node
+                            val prefValues = hashMapOf<String, Any>(
+                                "BRIGHT" to preferences[0],
+                                "MEDIUM" to preferences[1],
+                                "DARK" to preferences[2]
+                            )
+                            val childUpdates =
+                                hashMapOf<String, Any>("/emails/$emailKey/preferences" to prefValues)
+                            database.updateChildren(childUpdates)
+                        } else {
+                            // Email doesn't exist in the database, create a new node and save "preferences"
+                            val key: String = database.child("emails").push().key ?: ""
+                            val emailNode = database.child("emails").child(key)
+                            emailNode.child("email").setValue(email)
+                            emailNode.child("preferences").child("BRIGHT").setValue(preferences[0])
+                            emailNode.child("preferences").child("MEDIUM").setValue(preferences[1])
+                            emailNode.child("preferences").child("DARK").setValue(preferences[2])
 
-                    // Check if the email already exists in the database
-                    //If email already exists then update the existing preferences with new
-                    //U from CRUD
-                    val query: Query = database.child("emails").orderByChild("email").equalTo(email)
-                    query.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(dataSnapshot: DataSnapshot) {
-                            intent.putExtra("EMAIL", email)
-                            intent.putExtra("TOKEN", token)
-                            startActivity(intent)
-                            if (dataSnapshot.exists()) {
-                                // Email already exists in the database
-                                Log.i("FIREBASE", "Email already exists")
-                                // Get the key of the existing email node
-                                val emailNode = dataSnapshot.children.first()
-                                val emailKey = emailNode.key ?: ""
-                                // Save the "preferences" string for the existing email node
-                                val prefValues = hashMapOf<String, Any>(
-                                    "BRIGHT" to preferences[0],
-                                    "MEDIUM" to preferences[1],
-                                    "DARK" to preferences[2]
-                                )
-                                val childUpdates = hashMapOf<String, Any>("/emails/$emailKey/preferences" to prefValues)
-                                database.updateChildren(childUpdates)
-                            } else {
-                                //C from CRUD
-                                // Email doesn't exist in the database, create a new node and save "preferences"
-                                val key: String = database.child("emails").push().key ?: ""
-//                                val emailValues = hashMapOf<String, Any>(
-//                                    "email" to email
-//                                )
-                                val emailNode = database.child("emails").child(key)
-                                emailNode.child("email").setValue(email)
-                                emailNode.child("preferences").child("BRIGHT").setValue(preferences[0])
-                                emailNode.child("preferences").child("MEDIUM").setValue(preferences[1])
-                                emailNode.child("preferences").child("DARK").setValue(preferences[2])
-
-//                                val childUpdates = hashMapOf<String, Any>("/emails/$key" to emailValues)
-//                                database.updateChildren(childUpdates)
-
-                            }
                         }
+                    }
 
-                        override fun onCancelled(error: DatabaseError) {
-                            // Handle error
-                        }
-                    })
-                    Log.i("SubmitButton", "Submit button clicked; User email: $email")
-                },
-                Response.ErrorListener { error ->
-                    Log.e("SPOTIFY", "Error getting user email: ${error.message}")
-                }) {
-                @Throws(AuthFailureError::class)
-                override fun getHeaders(): Map<String, String> {
-                    val headers = HashMap<String, String>()
-                    headers["Authorization"] = "Bearer $token"
-                    return headers
-                }
+                    override fun onCancelled(error: DatabaseError) {
+                        // Handle error
+                    }
+                })
+                Log.i("SubmitButton", "Submit button clicked; User email: $email")
             }
-            queue.add(request)
-
         }
+
     }
 
     private fun parsePrefs(): List<String> {
@@ -176,13 +161,23 @@ class RecommendationActivity : AppCompatActivity() {
         return listOf<String>(brightStr.substring(0,brightStr.length-1),mediumStr.substring(0,mediumStr.length-1),darkStr.substring(0,darkStr.length-1))
     }
 
-    /*fun getSelectedCheckboxes(): List<String> {
-        // Return a list of strings for the text of the selected checkboxes
-        return listOf(
-            checkBoxList1.filter { it.isChecked }.map { it.text.toString() },
-            checkBoxList2.filter { it.isChecked }.map { it.text.toString() },
-            checkBoxList3.filter { it.isChecked }.map { it.text.toString() }
-        )
+    suspend fun getUserEmail(accessToken: String?): String? = withContext(Dispatchers.IO) {
+        val url = URL("https://api.spotify.com/v1/me")
+        val connection = url.openConnection() as HttpsURLConnection
+        connection.requestMethod = "GET"
+        connection.setRequestProperty("Authorization", "Bearer $accessToken")
+
+        val responseCode = connection.responseCode
+        if (responseCode == HttpsURLConnection.HTTP_OK) {
+            val response = connection.inputStream.bufferedReader().use { it.readText() }
+            val jsonResponse = JSONObject(response)
+            val email = jsonResponse.getString("email")
+
+            return@withContext email
+        } else {
+            Log.e("GetUserEmail", "HTTP error code: $responseCode")
+            return@withContext null
+        }
     }
-     */
+
 }
