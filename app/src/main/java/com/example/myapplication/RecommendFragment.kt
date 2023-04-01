@@ -15,6 +15,10 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -23,8 +27,6 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
-import android.content.Context.SENSOR_SERVICE
-
 
 
 /**
@@ -40,6 +42,8 @@ class RecommendFragment : Fragment() {
     private lateinit var mtvArtistName: TextView
     private lateinit var mivAlbumPic: ImageView
     private lateinit var mBtnAdd : Button
+    private lateinit var mBtnListen: Button
+    private lateinit var mtvListenStatus: TextView
 
     private lateinit var recommendedTracks: List<Song>
 
@@ -47,11 +51,14 @@ class RecommendFragment : Fragment() {
     private var lightSensor: Sensor? = null
     private var currentLightLevel: Float = 0f
     var playlistFlag=-1
+    private var player: ExoPlayer? = null
     data class Song(
         val name: String,
         val uri: String,
         val artist: String,
-        val albumImageUrl: String
+        val albumImageUrl: String,
+        val previewUrl: String,
+        val songID: String
     )
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -79,12 +86,36 @@ class RecommendFragment : Fragment() {
         mivAlbumPic = view.findViewById(R.id.albumPic)
         mBtnAdd = view.findViewById(R.id.btnAdd)
         mtvLightVal = view.findViewById<TextView>(R.id.lightVal)
+        mBtnListen=view.findViewById<Button>(R.id.listenButton)
+        mtvListenStatus=view.findViewById<TextView>(R.id.listenStatus)
 
         sensorManager = requireActivity().getSystemService(Context.SENSOR_SERVICE) as SensorManager
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
 
         recommendedTracks = emptyList()
+        mBtnListen.setOnClickListener(){
+            lifecycleScope.launch {
+                val previewUrl = getPreviewUrl(recommendedTracks[currentIndex].songID, accessToken)
+                Log.i("preview", "$previewUrl")
+                if(!previewUrl.equals("null")) {
+                    player = ExoPlayer.Builder(requireContext()).build()
+                    val dataSourceFactory = DefaultHttpDataSource.Factory()
+                    val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(MediaItem.fromUri(previewUrl ?: ""))
+                    player?.setMediaSource(mediaSource)
+                    player?.prepare()
+                    player?.play()
+                    mtvListenStatus.setText("Playing")
+
+                }else{
+                    mtvListenStatus.setText("No Existing Preview")
+                }
+            }
+        }
+
         mBtnCheckLight.setOnClickListener {
+            player?.release()
+            mtvListenStatus.setText("")
             currentLightLevel = measureAmbientLight()
             Log.i("myTag", currentLightLevel.toString())
 
@@ -123,6 +154,8 @@ class RecommendFragment : Fragment() {
         }
 
         mBtnAdd.setOnClickListener {
+            player?.release()
+            mtvListenStatus.setText("")
             if(playlistFlag!=-1){
                 //add recommendedTracks[currentIndex] to according playlist
                 if (recommendedTracks.isEmpty()) {
@@ -206,6 +239,22 @@ class RecommendFragment : Fragment() {
         }
     }
 
+    suspend fun getPreviewUrl(trackId: String, accessToken: String?): String? = withContext(Dispatchers.IO) {
+        val url = URL("https://api.spotify.com/v1/tracks/$trackId")
+        val connection = url.openConnection() as HttpsURLConnection
+        connection.requestMethod = "GET"
+        connection.setRequestProperty("Authorization", "Bearer $accessToken")
+
+        val responseCode = connection.responseCode
+        if (responseCode == HttpsURLConnection.HTTP_OK) {
+            val response = connection.inputStream.bufferedReader().use { it.readText() }
+            val jsonResponse = JSONObject(response)
+            return@withContext jsonResponse.getString("preview_url")
+        } else {
+            Log.e("GetPreviewUrl", "HTTP error code: $responseCode")
+            return@withContext null
+        }
+    }
 
     suspend fun getSongRecommendations(accessToken: String?, genres: String?): List<Song> = withContext(Dispatchers.IO) {
         val recommendationUrl = "https://api.spotify.com/v1/recommendations?seed_genres=$genres"
@@ -227,7 +276,9 @@ class RecommendFragment : Fragment() {
                 val songURI = track.getString("uri")
                 val artistName = track.getJSONArray("artists").getJSONObject(0).getString("name")
                 val albumImageUrl = track.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url")
-                val song = Song(songName, songURI, artistName, albumImageUrl)
+                val previewUrl=track.getString("preview_url")
+                val songID=track.getString("id")
+                val song = Song(songName, songURI, artistName, albumImageUrl, previewUrl,songID)
                 songList.add(song)
             }
 

@@ -99,7 +99,16 @@ class LibraryFragment : Fragment() {
                 val songURI = track.getString("uri")
                 val artistName = track.getJSONArray("artists").getJSONObject(0).getString("name")
                 val albumImageUrl = track.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url")
-                val song = RecommendFragment.Song(songName, songURI, artistName, albumImageUrl)
+                val previewUrl=track.getString("preview_url")
+                val songID=track.getString("id")
+                val song = RecommendFragment.Song(
+                    songName,
+                    songURI,
+                    artistName,
+                    albumImageUrl,
+                    previewUrl,
+                    songID
+                )
                 songList.add(song)
             }
             Log.i("psong", "reach2")
