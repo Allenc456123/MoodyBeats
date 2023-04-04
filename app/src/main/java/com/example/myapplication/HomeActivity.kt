@@ -41,6 +41,10 @@ class HomeActivity : AppCompatActivity() {
         Log.i("token", "token got???${accessToken}");
         val bundle = Bundle()
         bundle.putString("accessToken", accessToken)
+        recommendFragment.arguments = bundle
+        libraryFragment.arguments= bundle
+        profileFragment.arguments = bundle
+
         val targetNames = listOf("MoodyBeats-Dark", "MoodyBeats-Bright", "MoodyBeats-Medium")
 
         lifecycleScope.launch {
@@ -95,19 +99,17 @@ class HomeActivity : AppCompatActivity() {
         bottomNavigationView=findViewById(R.id.bottom_navigationBar)
 
 
-        supportFragmentManager.beginTransaction().replace(R.id.container, recommendFragment).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.container, libraryFragment).commit()
 
         bottomNavigationView.setOnItemSelectedListener(object : NavigationBarView.OnItemSelectedListener {
             override fun onNavigationItemSelected(item: MenuItem): Boolean {
                 when (item.itemId) {
 
                     R.id.recommend -> {
-                        recommendFragment.arguments = bundle
                         supportFragmentManager.beginTransaction().replace(R.id.container, recommendFragment).commit()
                         return true
                     }
                     R.id.library -> {
-                        libraryFragment.arguments=bundle
                         supportFragmentManager.beginTransaction().replace(R.id.container, libraryFragment).commit()
                         return true
                     }

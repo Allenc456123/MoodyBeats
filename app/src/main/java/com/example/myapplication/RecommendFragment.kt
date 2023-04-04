@@ -65,11 +65,17 @@ class RecommendFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+
         return inflater.inflate(R.layout.fragment_recommend, container, false)
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val accessToken = arguments?.getString("accessToken")
+        if (accessToken != null) {
+            Log.i("bundleCheck", accessToken)
+        } else {
+            Log.i("bundleCheck", "accessToken is null")
+        }
         var currentIndex = 0
         val darkID = arguments?.getString("darkID")
         val brightID = arguments?.getString("brightID")
