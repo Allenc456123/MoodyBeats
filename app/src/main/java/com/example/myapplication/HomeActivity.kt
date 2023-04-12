@@ -53,11 +53,11 @@ class HomeActivity : AppCompatActivity() {
             userID = getUserId(accessToken)
             targetNames.forEach { targetName ->
                 if (!playlistNames.contains(targetName)) {
-                    Log.i("myTag","createPlaylist is called for ${targetName}")
+                    //Log.i("myTag","createPlaylist is called for ${targetName}")
                     createPlaylist(accessToken, userID, targetName)
 
                 } else {
-                    Log.i("myTag","${targetName} already exists")
+                    //Log.i("myTag","${targetName} already exists")
                 }
             }
             playlistNames = getPlaylistNames(accessToken)
@@ -81,7 +81,7 @@ class HomeActivity : AppCompatActivity() {
                     bundle.putString("bright", brightPref)
                     bundle.putString("medium", mediumPref)
                     bundle.putString("dark", darkPref)
-                    Log.i("pref",brightPref+mediumPref+darkPref)
+                    //Log.i("pref",brightPref+mediumPref+darkPref)
                 }
             }
             override fun onCancelled(error: DatabaseError) {
@@ -89,13 +89,6 @@ class HomeActivity : AppCompatActivity() {
             }
         })
 
-
-
-        //getEmail(token)
-       /* email->dark->rap, hip-hop
-             ->light->classical
-             ->medium->pop, piano*/
-        /*Open up recommendation forms (fragments)*/
         bottomNavigationView=findViewById(R.id.bottom_navigationBar)
 
 
@@ -128,7 +121,7 @@ class HomeActivity : AppCompatActivity() {
 
     //Returns map of form <Key = PlaylistName, Value = PlaylistID>
     suspend fun getPlaylistNames(accessToken: String?): Map<String, String> = withContext(Dispatchers.IO) {
-        Log.i("myTag","getPlayListName has been entered")
+        //Log.i("myTag","getPlayListName has been entered")
         val playlistUrl = "https://api.spotify.com/v1/me/playlists"
         val url = URL(playlistUrl)
         val connection = url.openConnection() as HttpsURLConnection
@@ -149,19 +142,19 @@ class HomeActivity : AppCompatActivity() {
                 playlistMap[playlistName] = playlistID
             }
 
-            Log.i("myTag","getPlayListNamesMap is returning")
+            //Log.i("myTag","getPlayListNamesMap is returning")
             return@withContext playlistMap
         } else {
-            Log.e("GetPlaylistNamesMap", "HTTP error code: $responseCode")
-            Log.i("myTag","getPlayListNamesMap is returning")
+            //Log.e("GetPlaylistNamesMap", "HTTP error code: $responseCode")
+            //Log.i("myTag","getPlayListNamesMap is returning")
             return@withContext emptyMap()
         }
     }
 
     suspend fun createPlaylist(accessToken: String?, userId: String, playlistName: String) = withContext(Dispatchers.IO) {
-        Log.i("myTag", "createPlaylist: accessToken is ${accessToken}")
-        Log.i("myTag", "createPlaylist: userId is ${userId}")
-        Log.i("myTag", "createPlaylist: playlistName is ${playlistName}")
+        //Log.i("myTag", "createPlaylist: accessToken is ${accessToken}")
+        //Log.i("myTag", "createPlaylist: userId is ${userId}")
+        //Log.i("myTag", "createPlaylist: playlistName is ${playlistName}")
         val url = URL("https://api.spotify.com/v1/users/$userId/playlists")
         val connection = url.openConnection() as HttpsURLConnection
         connection.requestMethod = "POST"
@@ -178,8 +171,8 @@ class HomeActivity : AppCompatActivity() {
 
         val responseCode = connection.responseCode
         if (responseCode != HttpsURLConnection.HTTP_CREATED) {
-            Log.e("CreatePlaylist", "HTTP error code: $responseCode")
-//            Log.i("myTag", "Response body: ${connection.responseCode.}")
+            //Log.e("CreatePlaylist", "HTTP error code: $responseCode")
+            //Log.i("myTag", "Response body: ${connection.responseCode.}")
             throw RuntimeException("Failed to create playlist")
 
         }
@@ -197,33 +190,33 @@ class HomeActivity : AppCompatActivity() {
             val jsonResponse = JSONObject(response)
             return@withContext jsonResponse.getString("id")
         } else {
-            Log.e("GetUserId", "HTTP error code: $responseCode")
+            //.e("GetUserId", "HTTP error code: $responseCode")
             throw RuntimeException("Failed to get user ID")
         }
     }
 
     override fun onStart() {
         super.onStart()
-        Log.i("myTag","OnStart for Home Activity has been called")
+        //Log.i("myTag","OnStart for Home Activity has been called")
     }
 
     override fun onResume() {
         super.onResume()
-        Log.i("myTag","OnResume for Home Activity has been called")
+        //Log.i("myTag","OnResume for Home Activity has been called")
     }
 
     override fun onPause() {
         super.onPause()
-        Log.i("myTag","OnPause for Home Activity has been called")
+        //Log.i("myTag","OnPause for Home Activity has been called")
     }
 
     override fun onStop() {
         super.onStop()
-        Log.i("myTag","OnStop for Home Activity has been called")
+        //Log.i("myTag","OnStop for Home Activity has been called")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.i("myTag","OnDestroy for Home Activity has been called")
+        //Log.i("myTag","OnDestroy for Home Activity has been called")
     }
 }

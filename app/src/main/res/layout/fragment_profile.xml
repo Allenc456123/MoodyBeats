@@ -19,9 +19,9 @@
         android:layout_below="@+id/profilePic"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="32dp"
-        android:text="Username"
+        android:text="@string/username_string"
         android:textColor="@android:color/white"
-        android:textSize="24sp" />
+        android:textSize="22sp" />
 
     <TextView
         android:id="@+id/email"
@@ -30,9 +30,9 @@
         android:layout_below="@+id/username"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-        android:text="Email"
+        android:text="@string/email_string"
         android:textColor="@android:color/white"
-        android:textSize="18sp" />
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/followerCount"
@@ -41,7 +41,7 @@
         android:layout_below="@+id/email"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-        android:text="Follower Count"
+        android:text="@string/followers_string"
         android:textColor="@android:color/white"
         android:textSize="18sp" />
 
@@ -52,6 +52,6 @@
         android:layout_below="@+id/followerCount"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="32dp"
-        android:text="Delete User Data" />
+        android:text="@string/deleteData_string" />
 
 </RelativeLayout>

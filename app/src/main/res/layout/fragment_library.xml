@@ -15,19 +15,19 @@
             android:id="@+id/btn_dark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Dark"/>
+            android:text="@string/dark_string"/>
 
         <Button
             android:id="@+id/btn_medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Medium"/>
+            android:text="@string/medium_string"/>
 
         <Button
             android:id="@+id/btn_bright"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bright"/>
+            android:text="@string/bright_string"/>
 
     </LinearLayout>
 

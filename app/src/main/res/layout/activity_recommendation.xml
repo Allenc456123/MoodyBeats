@@ -20,7 +20,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Bright Lighting"
+                android:text="@string/brightLight_string"
                 android:textSize="18sp" />
             <CheckBox
                 android:id="@+id/checkbox1_1"
@@ -101,7 +101,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Medium Lighting"
+                android:text="@string/mediumLight_string"
                 android:textSize="18sp" />
             <CheckBox
                 android:id="@+id/checkbox2_1"
@@ -185,7 +185,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:text="Dark Lighting"
+                android:text="@string/darkLight_string"
                 android:textSize="18sp" />
             <CheckBox
                 android:id="@+id/checkbox3_1"
@@ -261,7 +261,7 @@
             android:id="@+id/submit_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Submit"
+            android:text="@string/submit_string"
             android:layout_centerInParent="true"/>
     </LinearLayout>
 </ScrollView>

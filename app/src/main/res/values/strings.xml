@@ -12,6 +12,25 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string name="login_string">Login with Spotify</string>
+    <string name="signup_string">Sign Up with Spotify</string>
+
+    <string name="brightLight_string">Bright Lighting</string>
+    <string name="mediumLight_string">Medium Lighting</string>
+    <string name="darkLight_string">Dark Lighting</string>
+    <string name="submit_string">Submit</string>
+    <string name="bright_string">Bright</string>
+    <string name="medium_string">Medium</string>
+    <string name="dark_string">Dark</string>
+    <string name="deleteData_string">Delete User Data</string>
+    <string name="username_string">Username: </string>
+    <string name="email_string">Email: </string>
+    <string name="followers_string">Follower Count: </string>
+    <string name="add_string">Add</string>
+    <string name="song_string">New Song</string>
+    <string name="listen_string">Listen</string>
+
+
     <string name="genre1">Rock</string>
     <string name="genre2">Pop</string>
     <string name="genre3">Jazz</string>
@@ -22,4 +41,8 @@
     <string name="genre8">EDM</string>
     <string name="genre9">R-n-B</string>
     <string name="genre10">Indie</string>
+
+    <string name="rec_string">Recommend</string>
+    <string name="lib_string">Library</string>
+    <string name="profile_string">Profile</string>
 </resources>

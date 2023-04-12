@@ -13,7 +13,6 @@ import com.spotify.sdk.android.auth.AuthorizationResponse
 
 private const val CLIENT_ID = "8a9c4c8a356e484eb01e57b844806133"
 private const val REDIRECT_URI = "com.example.myapplication://callback"
-private var mSpotifyAppRemote: SpotifyAppRemote? = null
 private const val REQUEST_CODE = 1337
 
 
@@ -29,7 +28,7 @@ class LoginActivity : AppCompatActivity() {
         val request = builder.build()
         setContentView(R.layout.activity_login)
 
-        Log.i("myTag","OnCreate for Login Activity has been called")
+        //Log.i("myTag","OnCreate for Login Activity has been called")
 
         val loginButton = findViewById<Button>(R.id.loginButton)
         loginButton.setOnClickListener {
@@ -59,67 +58,41 @@ class LoginActivity : AppCompatActivity() {
             when (response.type) {
                 AuthorizationResponse.Type.TOKEN -> {
                     val token = response.accessToken
-                    Log.d("AUTHENTICATION", "Got Spotify access token: $token")
+                    //Log.d("AUTHENTICATION", "Got Spotify access token: $token")
                     // Save token to SharedPreferences or use it to make API requests
                     val intent = Intent(this, RecommendationActivity::class.java)
                     intent.putExtra("TOKEN_KEY", token)
                     startActivity(intent)
                 }
                 AuthorizationResponse.Type.ERROR -> {
-                    Log.e("AUTHENTICATION", "Failed to authenticate with Spotify: ${response.error}")
+                    //Log.e("AUTHENTICATION", "Failed to authenticate with Spotify: ${response.error}")
                     // Handle authentication error
                 }
                 else -> {
-                    Log.e("AUTHENTICATION", "Unknown authentication response type: ${response.type}")
+                    //Log.e("AUTHENTICATION", "Unknown authentication response type: ${response.type}")
                     // Handle unknown response type
                 }
             }
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        /*val connectionParams = ConnectionParams.Builder(CLIENT_ID)
-            .setRedirectUri(REDIRECT_URI)
-            .showAuthView(true)
-            .build()
-        SpotifyAppRemote.connect(this, connectionParams,
-            object : Connector.ConnectionListener {
-                override fun onConnected(spotifyAppRemote: SpotifyAppRemote) {
-                    mSpotifyAppRemote = spotifyAppRemote
-                    Log.d("MainActivity", "Connected! Yay!")
-                    Log.i("tag", "spot onconnect")
-                    // Now you can start interacting with App Remote
-                    //connected()
-                }
-
-                override fun onFailure(throwable: Throwable) {
-                    Log.e("MainActivity", throwable.message, throwable)
-
-                    // Something went wrong when attempting to connect! Handle errors here
-                }
-            })
-*/
-        Log.i("myTag","OnStart for Login Activity has been called")
-    }
-
     override fun onResume() {
         super.onResume()
-        Log.i("myTag","OnResume for Login Activity has been called")
+        //Log.i("myTag","OnResume for Login Activity has been called")
     }
 
     override fun onPause() {
         super.onPause()
-        Log.i("myTag","OnPause for Login Activity has been called")
+        //Log.i("myTag","OnPause for Login Activity has been called")
     }
 
     override fun onStop() {
         super.onStop()
-        Log.i("myTag","OnStop for Login Activity has been called")
+        //Log.i("myTag","OnStop for Login Activity has been called")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.i("myTag","OnDestroy for Login Activity has been called")
+        //Log.i("myTag","OnDestroy for Login Activity has been called")
     }
 }

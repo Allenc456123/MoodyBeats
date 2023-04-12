@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mi Aplicación</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login_string">Iniciar sesión con Spotify</string>
+    <string name="signup_string">Registrarse con Spotify</string>
+    <string name="brightLight_string">Iluminación Brillante</string>
+    <string name="mediumLight_string">Iluminación Media</string>
+    <string name="darkLight_string">Iluminación Oscura</string>
+    <string name="submit_string">Enviar</string>
+    <string name="bright_string">Brillante</string>
+    <string name="medium_string">Media</string>
+    <string name="dark_string">Oscura</string>
+    <string name="deleteData_string">Eliminar Datos de Usuario</string>
+    <string name="username_string">Nombre de Usuario: </string>
+    <string name="email_string">Correo Electrónico: </string>
+    <string name="followers_string">Seguidores: </string>
+    <string name="add_string">Agregar</string>
+    <string name="song_string">Nueva Canción</string>
+    <string name="listen_string">Escuchar</string>
+    <string name="genre1">Rock</string>
+    <string name="genre2">Pop</string>
+    <string name="genre3">Jazz</string>
+    <string name="genre4">Classical</string>
+    <string name="genre5">Country</string>
+    <string name="genre6">Alt-rock</string>
+    <string name="genre7">Hip-Hop</string>
+    <string name="genre8">EDM</string>
+    <string name="genre9">R-n-B</string>
+    <string name="genre10">Indie</string>
+    <string name="rec_string">Recomendar</string>
+    <string name="lib_string">Biblioteca</string>
+    <string name="profile_string">Perfil</string>
+</resources>

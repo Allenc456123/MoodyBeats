@@ -29,7 +29,14 @@ class LibraryFragment : Fragment() {
     private lateinit var brightButton: Button
     private lateinit var playlistRecyclerView: RecyclerView
 
-    private var currentSongList: List<RecommendFragment.Song> = emptyList()
+    private var currentSongList: List<CompactSong> = emptyList()
+
+
+    data class CompactSong(
+        val name: String,
+        val artist: String,
+    )
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,6 +44,8 @@ class LibraryFragment : Fragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_library, container, false)
     }
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val accessToken = arguments?.getString("accessToken")
@@ -48,12 +57,11 @@ class LibraryFragment : Fragment() {
         brightButton = view.findViewById(R.id.btn_bright)
         playlistRecyclerView = view.findViewById(R.id.playlist_recycler_view)
 
-        // Set up button click listeners
         darkButton.setOnClickListener {
             loadPlaylist(darkID, accessToken)
         }
         mediumButton.setOnClickListener {
-            Log.i("pid", "hhhhhhh")
+            //Log.i("pid", "hhhhhhh")
             loadPlaylist(mediumID, accessToken)
         }
         brightButton.setOnClickListener {
@@ -64,8 +72,8 @@ class LibraryFragment : Fragment() {
 
     private fun loadPlaylist(playlistId: String?, accessToken: String?) {
         // Retrieve playlists from Spotify web API
-        Log.i("pid", "$accessToken")
-        Log.i("aid", "$playlistId")
+        //Log.i("pid", "$accessToken")
+        //Log.i("aid", "$playlistId")
         if (accessToken != null && playlistId != null) {
             lifecycleScope.launch {
                 val songs = getPlaylistSongs(accessToken, playlistId)
@@ -77,7 +85,7 @@ class LibraryFragment : Fragment() {
         }
     }
 
-    private suspend fun getPlaylistSongs(accessToken: String, playlistId: String): List<RecommendFragment.Song> = withContext(
+    private suspend fun getPlaylistSongs(accessToken: String, playlistId: String): List<CompactSong> = withContext(
         Dispatchers.IO) {
         val playlistUrl = "https://api.spotify.com/v1/playlists/$playlistId/tracks"
         val url = URL(playlistUrl)
@@ -90,31 +98,23 @@ class LibraryFragment : Fragment() {
             val response = connection.inputStream.bufferedReader().use { it.readText() }
             val jsonResponse = JSONObject(response)
             val tracks = jsonResponse.getJSONArray("items")
-            val songList = mutableListOf<RecommendFragment.Song>()
-            Log.i("psong", "reach1")
+            val songList = mutableListOf<CompactSong>()
+            //Log.i("psong", "reach1")
 
             for (i in 0 until tracks.length()) {
                 val track = tracks.getJSONObject(i).getJSONObject("track")
                 val songName = track.getString("name")
-                val songURI = track.getString("uri")
                 val artistName = track.getJSONArray("artists").getJSONObject(0).getString("name")
-                val albumImageUrl = track.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url")
-                val previewUrl=track.getString("preview_url")
-                val songID=track.getString("id")
-                val song = RecommendFragment.Song(
+                val song = CompactSong(
                     songName,
-                    songURI,
-                    artistName,
-                    albumImageUrl,
-                    previewUrl,
-                    songID
+                    artistName
                 )
                 songList.add(song)
             }
-            Log.i("psong", "reach2")
+            //Log.i("psong", "reach2")
             return@withContext songList
         } else {
-            Log.e("GetPlaylistSongs", "HTTP error code: $responseCode")
+            //Log.e("GetPlaylistSongs", "HTTP error code: $responseCode")
             return@withContext emptyList()
         }
     }

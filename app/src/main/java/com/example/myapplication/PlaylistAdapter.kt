@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class PlaylistAdapter(private val songs: List<RecommendFragment.Song>) :
+class PlaylistAdapter(private val songs: List<LibraryFragment.CompactSong>) :
     RecyclerView.Adapter<PlaylistAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

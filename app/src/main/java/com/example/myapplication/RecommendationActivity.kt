@@ -175,7 +175,7 @@ class RecommendationActivity : AppCompatActivity() {
 
             return@withContext email
         } else {
-            Log.e("GetUserEmail", "HTTP error code: $responseCode")
+            //Log.e("GetUserEmail", "HTTP error code: $responseCode")
             return@withContext null
         }
     }

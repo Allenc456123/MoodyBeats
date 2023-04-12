@@ -72,9 +72,9 @@ class RecommendFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val accessToken = arguments?.getString("accessToken")
         if (accessToken != null) {
-            Log.i("bundleCheck", accessToken)
+            //Log.i("bundleCheck", accessToken)
         } else {
-            Log.i("bundleCheck", "accessToken is null")
+            //Log.i("bundleCheck", "accessToken is null")
         }
         var currentIndex = 0
         val darkID = arguments?.getString("darkID")
@@ -84,7 +84,7 @@ class RecommendFragment : Fragment() {
         val darkP : String? = arguments?.getString("dark")
         val mediumP : String? = arguments?.getString("medium")
         val brightP : String? = arguments?.getString("bright")
-        Log.i("myTag", brightP.toString())
+        //Log.i("myTag", brightP.toString())
         // Here you can access your views and add your logic
         mBtnCheckLight = view.findViewById<Button>(R.id.getSong)
         mtvSongName = view.findViewById(R.id.songName)
@@ -102,7 +102,7 @@ class RecommendFragment : Fragment() {
         mBtnListen.setOnClickListener(){
             lifecycleScope.launch {
                 val previewUrl = getPreviewUrl(recommendedTracks[currentIndex].songID, accessToken)
-                Log.i("preview", "$previewUrl")
+                //Log.i("preview", "$previewUrl")
                 if(!previewUrl.equals("null")) {
                     player = ExoPlayer.Builder(requireContext()).build()
                     val dataSourceFactory = DefaultHttpDataSource.Factory()
@@ -123,23 +123,23 @@ class RecommendFragment : Fragment() {
             player?.release()
             mtvListenStatus.setText("")
             currentLightLevel = measureAmbientLight()
-            Log.i("myTag", currentLightLevel.toString())
+            //Log.i("myTag", currentLightLevel.toString())
 
             if (recommendedTracks.isEmpty()) {
                 lifecycleScope.launch {
-                    Log.i("myTag","TEST")
+                    //Log.i("myTag","TEST")
                     if(currentLightLevel < 5){
-                        Log.i("myTag","Getting dark prefs")
+                        //Log.i("myTag","Getting dark prefs")
                         recommendedTracks = getSongRecommendations(accessToken, darkP)
                         mtvLightVal.text = "Light Value: "+currentLightLevel.toString()+" Playlist: Dark"
                         playlistFlag=1
                     } else if(currentLightLevel >= 5 && currentLightLevel < 20){
-                        Log.i("myTag","Getting medium prefs")
+                        //Log.i("myTag","Getting medium prefs")
                         recommendedTracks = getSongRecommendations(accessToken, mediumP)
                         mtvLightVal.text = "Light Value: "+currentLightLevel.toString()+" Playlist: Medium"
                         playlistFlag=2
                     } else {
-                        Log.i("myTag","Getting bright prefs")
+                        //Log.i("myTag","Getting bright prefs")
                         recommendedTracks = getSongRecommendations(accessToken, brightP)
                         mtvLightVal.text = "Light Value: "+currentLightLevel.toString()+" Playlist: Bright"
                         playlistFlag=3
@@ -166,19 +166,19 @@ class RecommendFragment : Fragment() {
                 //add recommendedTracks[currentIndex] to according playlist
                 if (recommendedTracks.isEmpty()) {
                     lifecycleScope.launch {
-                        Log.i("myTag","TEST")
+                        //Log.i("myTag","TEST")
                         if(currentLightLevel < 5){
-                            Log.i("myTag","Getting dark prefs")
+                            //Log.i("myTag","Getting dark prefs")
                             recommendedTracks = getSongRecommendations(accessToken, darkP)
                             mtvLightVal.text = "Light Value: "+currentLightLevel.toString()+" Playlist: Dark"
                             playlistFlag=1
                         } else if(currentLightLevel >= 5 && currentLightLevel < 20){
-                            Log.i("myTag","Getting medium prefs")
+                            //Log.i("myTag","Getting medium prefs")
                             recommendedTracks = getSongRecommendations(accessToken, mediumP)
                             mtvLightVal.text = "Light Value: "+currentLightLevel.toString()+" Playlist: Medium"
                             playlistFlag=2
                         } else {
-                            Log.i("myTag","Getting bright prefs")
+                            //Log.i("myTag","Getting bright prefs")
                             recommendedTracks = getSongRecommendations(accessToken, brightP)
                             mtvLightVal.text = "Light Value: "+currentLightLevel.toString()+" Playlist: Bright"
                             playlistFlag=3
@@ -195,15 +195,15 @@ class RecommendFragment : Fragment() {
                         when (playlistFlag) {
                             1 -> {
                                 val success = addSongToPlaylist(accessToken, darkID, recommendedTracks[currentIndex].uri)
-                                Log.i("playlistAdd", "dark "+success.toString())
+                                //Log.i("playlistAdd", "dark "+success.toString())
                             }
                             2 -> {
                                 val success = addSongToPlaylist(accessToken, mediumID, recommendedTracks[currentIndex].uri)
-                                Log.i("playlistAdd", "medium "+success.toString())
+                                //Log.i("playlistAdd", "medium "+success.toString())
                             }
                             3 -> {
                                 val success = addSongToPlaylist(accessToken, brightID, recommendedTracks[currentIndex].uri)
-                                Log.i("playlistAdd", "bright "+success.toString())
+                                //Log.i("playlistAdd", "bright "+success.toString())
                             }
                         }
                     }
@@ -240,7 +240,7 @@ class RecommendFragment : Fragment() {
         if (responseCode == HttpsURLConnection.HTTP_CREATED) {
             return@withContext true
         } else {
-            Log.e("AddSongToPlaylist", "HTTP error code: $responseCode")
+            //Log.e("AddSongToPlaylist", "HTTP error code: $responseCode")
             return@withContext false
         }
     }
@@ -257,7 +257,7 @@ class RecommendFragment : Fragment() {
             val jsonResponse = JSONObject(response)
             return@withContext jsonResponse.getString("preview_url")
         } else {
-            Log.e("GetPreviewUrl", "HTTP error code: $responseCode")
+            //.e("GetPreviewUrl", "HTTP error code: $responseCode")
             return@withContext null
         }
     }
@@ -290,7 +290,7 @@ class RecommendFragment : Fragment() {
 
             return@withContext songList
         } else {
-            Log.e("GetSongRecommendations", "HTTP error code: $responseCode")
+            //Log.e("GetSongRecommendations", "HTTP error code: $responseCode")
             return@withContext emptyList()
         }
     }
@@ -309,6 +309,11 @@ class RecommendFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         sensorManager.unregisterListener(lightSensorListener)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        player?.release()
     }
 
     private val lightSensorListener = object : SensorEventListener {

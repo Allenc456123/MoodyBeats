@@ -35,7 +35,7 @@ class ProfileFragment : Fragment() {
     )
     fun setEmail(emailFromHome: String) {
         email = emailFromHome
-        Log.i("frag", email)
+        //Log.i("frag", email)
     }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,9 +55,9 @@ class ProfileFragment : Fragment() {
         lifecycleScope.launch {
             var userData: UserProfile? = fetchUserProfile(accessToken)
             Picasso.get().load(userData?.imageUrl).into(mivProfilePic) // load album image using Picasso library
-            mtvUsername.setText("Username: " + userData?.displayName)
-            mtvEmail.setText("Email: " + userData?.email)
-            mtvFollowerCount.setText("Followers: " + userData?.followers.toString())
+            mtvUsername.setText(getResources().getString(R.string.username_string) +" "+ userData?.displayName)
+            mtvEmail.setText(getResources().getString(R.string.email_string) +" "+ userData?.email)
+            mtvFollowerCount.setText(getResources().getString(R.string.followers_string) +" "+ userData?.followers.toString())
         }
         // Here you can access your views and add your logic
         val deleteAccButt = view.findViewById<Button>(R.id.deleteAccButton)
@@ -66,7 +66,7 @@ class ProfileFragment : Fragment() {
         //The database removes all data about the user
         //D from CRUD
         deleteAccButt.setOnClickListener {
-            Log.i("delete", "delete account button clicked")
+            //Log.i("delete", "delete account button clicked")
             val query: Query = database.child("emails").orderByChild("email").equalTo(email)
             query.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -87,7 +87,7 @@ class ProfileFragment : Fragment() {
 
                 override fun onCancelled(error: DatabaseError) {
                     // Handle error
-                    Log.e("FIREBASE", "Error deleting user: ${error.message}")
+                    //Log.e("FIREBASE", "Error deleting user: ${error.message}")
                     Toast.makeText(context, "Error deleting user: ${error.message}", Toast.LENGTH_SHORT).show()
                 }
             })
@@ -112,7 +112,7 @@ class ProfileFragment : Fragment() {
 
             return@withContext UserProfile(displayName, email, followers, imageUrl)
         } else {
-            Log.e("FetchUserProfile", "HTTP error code: $responseCode")
+            //Log.e("FetchUserProfile", "HTTP error code: $responseCode")
             return@withContext null
         }
     }
