@@ -187,7 +187,8 @@ class HomeActivity : AppCompatActivity() {
             return@withContext jsonResponse.getString("id")
         } else {
             //.e("GetUserId", "HTTP error code: $responseCode")
-            throw RuntimeException("Failed to get user ID")
+            //throw RuntimeException("Failed to get user ID")
+            return@withContext ""
         }
     }
 
