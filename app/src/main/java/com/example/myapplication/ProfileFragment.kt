@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.URL
+import java.net.UnknownServiceException
 import javax.net.ssl.HttpsURLConnection
 private lateinit var mivProfilePic: ImageView
 private lateinit var mtvUsername: TextView
@@ -38,9 +39,41 @@ class ProfileFragment : Fragment() {
         val followers: Int,
         val imageUrl: String?
     )
-    fun setEmail(emailFromHome: String) {
+
+    public fun getEmail(profile: UserProfile?): String {
+        if (profile != null) {
+            return profile.email
+        } else {
+            return ""
+        }
+    }
+    public fun getDisplayName(profile: UserProfile?): String {
+        if (profile != null) {
+            return profile.displayName
+        } else {
+            return ""
+        }
+    }
+
+    public fun getURL(profile: UserProfile?) : String? {
+        if (profile != null) {
+            return profile.imageUrl
+        } else {
+            return ""
+        }
+    }
+
+
+    public fun getFollowers(profile: UserProfile?) : Int {
+        if (profile != null) {
+            return profile.followers
+        } else {
+            return 0
+        }
+    }
+
+    fun setEmail(emailFromHome: String){
         email = emailFromHome
-        //Log.i("frag", email)
     }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,10 +99,10 @@ class ProfileFragment : Fragment() {
             // Device is connected to the internet
             lifecycleScope.launch {
                 var userData: UserProfile? = fetchUserProfile(accessToken)
-                Picasso.get().load(userData?.imageUrl).into(mivProfilePic) // load album image using Picasso library
-                mtvUsername.setText(getResources().getString(R.string.username_string) +" "+ userData?.displayName)
-                mtvEmail.setText(getResources().getString(R.string.email_string) +" "+ userData?.email)
-                mtvFollowerCount.setText(getResources().getString(R.string.followers_string) +" "+ userData?.followers.toString())
+                Picasso.get().load(getURL(userData)).into(mivProfilePic) // load album image using Picasso library
+                mtvUsername.setText(getResources().getString(R.string.username_string) +" "+ getDisplayName(userData))
+                mtvEmail.setText(getResources().getString(R.string.email_string) +" "+ getEmail(userData))
+                mtvFollowerCount.setText(getResources().getString(R.string.followers_string) +" "+ getFollowers(userData).toString())
             }
         } else {
             // Device is not connected to the internet
