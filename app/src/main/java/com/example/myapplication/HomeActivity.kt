@@ -8,9 +8,6 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import com.google.firebase.database.*
-import com.spotify.android.appremote.api.Connector
-import com.spotify.android.appremote.api.SpotifyAppRemote
-import com.spotify.protocol.client.CallResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,7 +22,6 @@ class HomeActivity : AppCompatActivity() {
     private val recommendFragment = RecommendFragment()
     private val libraryFragment = LibraryFragment()
     private val profileFragment = ProfileFragment()
-    private lateinit var spotifyAppRemote: SpotifyAppRemote
     private lateinit var playlistNames: Map<String,String>
     private lateinit var userID: String
     private lateinit var brightPref: String

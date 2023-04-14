@@ -1,9 +1,13 @@
 package com.example.myapplication
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
@@ -30,7 +34,19 @@ class LoginActivity : AppCompatActivity() {
 
         val loginButton = findViewById<Button>(R.id.loginButton)
         loginButton.setOnClickListener {
-            AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request)
+            val context: Context = this
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val network = connectivityManager.activeNetwork
+            val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+            if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                // Device is connected to the internet
+                AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request)
+
+            } else {
+                // Device is not connected to the internet
+                Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show()
+
+            }
         }
 
         val button = findViewById<Button>(R.id.signUpButton)

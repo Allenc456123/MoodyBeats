@@ -5,6 +5,8 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -14,6 +16,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -100,6 +103,10 @@ class RecommendFragment : Fragment() {
 
         recommendedTracks = emptyList()
         mBtnListen.setOnClickListener(){
+            val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val network = connectivityManager.activeNetwork
+            val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+            if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
             lifecycleScope.launch {
                 val previewUrl = getPreviewUrl(recommendedTracks[currentIndex].songID, accessToken)
                 //Log.i("preview", "$previewUrl")
@@ -117,9 +124,17 @@ class RecommendFragment : Fragment() {
                     mtvListenStatus.setText("No Existing Preview")
                 }
             }
+
+            }else{
+                Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show()
+            }
         }
 
         mBtnCheckLight.setOnClickListener {
+            val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val network = connectivityManager.activeNetwork
+            val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+            if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
             player?.release()
             mtvListenStatus.setText("")
             currentLightLevel = measureAmbientLight()
@@ -157,9 +172,16 @@ class RecommendFragment : Fragment() {
                     displaySong(currentIndex)
                 }
             }
+            }else{
+                Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show()
+            }
         }
 
         mBtnAdd.setOnClickListener {
+            val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val network = connectivityManager.activeNetwork
+            val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+            if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
             player?.release()
             mtvListenStatus.setText("")
             if(playlistFlag!=-1){
@@ -213,6 +235,9 @@ class RecommendFragment : Fragment() {
                     }
                 }
 
+            }
+            }else{
+                Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show()
             }
         }
 

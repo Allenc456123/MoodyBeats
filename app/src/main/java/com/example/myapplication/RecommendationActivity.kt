@@ -1,17 +1,22 @@
 package com.example.myapplication
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.Toast
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.google.firebase.database.*
+import com.spotify.sdk.android.auth.AuthorizationClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -24,9 +29,9 @@ import kotlin.collections.HashMap
 
 class RecommendationActivity : AppCompatActivity() {
 
-    private lateinit var checkBoxList1: MutableList<CheckBox>
-    private lateinit var checkBoxList2: MutableList<CheckBox>
-    private lateinit var checkBoxList3: MutableList<CheckBox>
+    lateinit var checkBoxList1: MutableList<CheckBox>
+    lateinit var checkBoxList2: MutableList<CheckBox>
+    lateinit var checkBoxList3: MutableList<CheckBox>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +88,14 @@ class RecommendationActivity : AppCompatActivity() {
 
         submitButton.setOnClickListener {
             val preferences: List<String> = parsePrefs()
+            val context: Context = this
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val network = connectivityManager.activeNetwork
+            val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+
+            if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                // Device is connected to the internet
+
             GlobalScope.launch(Dispatchers.Main) {
                 Log.i("SubmitButton", "token"+"$token")
                 val email = getUserEmail(token)
@@ -131,11 +144,16 @@ class RecommendationActivity : AppCompatActivity() {
                 })
                 Log.i("SubmitButton", "Submit button clicked; User email: $email")
             }
+            } else {
+                // Device is not connected to the internet
+                Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show()
+
+            }
         }
 
     }
 
-    private fun parsePrefs(): List<String> {
+    public fun parsePrefs(): List<String> {
         var brightStr: String = ""
         var mediumStr: String = ""
         var darkStr: String = ""

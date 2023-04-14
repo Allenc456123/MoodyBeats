@@ -1,6 +1,9 @@
 package com.example.myapplication
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -13,6 +16,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.database.*
+import com.spotify.sdk.android.auth.AuthorizationClient
+import com.spotify.sdk.android.auth.LoginActivity.REQUEST_CODE
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,22 +55,36 @@ class ProfileFragment : Fragment() {
         mtvFollowerCount = view.findViewById<TextView>(R.id.followerCount)
         mivProfilePic = view.findViewById(R.id.profilePic)
         val accessToken = arguments?.getString("accessToken")
-
-        super.onViewCreated(view, savedInstanceState)
-        lifecycleScope.launch {
-            var userData: UserProfile? = fetchUserProfile(accessToken)
-            Picasso.get().load(userData?.imageUrl).into(mivProfilePic) // load album image using Picasso library
-            mtvUsername.setText(getResources().getString(R.string.username_string) +" "+ userData?.displayName)
-            mtvEmail.setText(getResources().getString(R.string.email_string) +" "+ userData?.email)
-            mtvFollowerCount.setText(getResources().getString(R.string.followers_string) +" "+ userData?.followers.toString())
-        }
         // Here you can access your views and add your logic
         val deleteAccButt = view.findViewById<Button>(R.id.deleteAccButton)
         val database = FirebaseDatabase.getInstance().reference
+        super.onViewCreated(view, savedInstanceState)
+        val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+        if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+            // Device is connected to the internet
+            lifecycleScope.launch {
+                var userData: UserProfile? = fetchUserProfile(accessToken)
+                Picasso.get().load(userData?.imageUrl).into(mivProfilePic) // load album image using Picasso library
+                mtvUsername.setText(getResources().getString(R.string.username_string) +" "+ userData?.displayName)
+                mtvEmail.setText(getResources().getString(R.string.email_string) +" "+ userData?.email)
+                mtvFollowerCount.setText(getResources().getString(R.string.followers_string) +" "+ userData?.followers.toString())
+            }
+        } else {
+            // Device is not connected to the internet
+            Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show()
+
+        }
+
         //If user presses delete account button on profile page
         //The database removes all data about the user
         //D from CRUD
         deleteAccButt.setOnClickListener {
+            val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val network = connectivityManager.activeNetwork
+            val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+            if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
             //Log.i("delete", "delete account button clicked")
             val query: Query = database.child("emails").orderByChild("email").equalTo(email)
             query.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -91,6 +110,10 @@ class ProfileFragment : Fragment() {
                     Toast.makeText(context, "Error deleting user: ${error.message}", Toast.LENGTH_SHORT).show()
                 }
             })
+            }else{
+                Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show()
+            }
+
 
         }
     }
